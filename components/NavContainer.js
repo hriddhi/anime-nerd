@@ -9,16 +9,17 @@ import { createStackNavigator } from '@react-navigation/stack';
 const Stack = createStackNavigator();
 
 import { connect } from 'react-redux';
-import { toggleSearch, updateSearch } from '../redux/ActionCreator';
+import { updateSearch } from '../redux/ActionCreator';
 
 const mapStateToProps = state => {
     return {
-        search: state.search.search
+        search: state.search.search,
+        access_token: state.auth.access_token
     }
 }
 
 const mapDispatchToProps = (dispatch) => ({
-    updateSearch: (str) => dispatch(updateSearch(str))
+    updateSearch: (str, token) => dispatch(updateSearch(str, token))
 })
 
 class Nav extends React.Component {
@@ -34,8 +35,8 @@ class Nav extends React.Component {
     if(search.length > 2){
       clearTimeout(this.timer);
       this.timer = setTimeout(() => {
-        this.props.updateSearch(search)
-      }, 1000);
+        this.props.updateSearch(search, this.props.access_token)
+      }, 500);
     }
   }
 
