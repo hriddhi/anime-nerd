@@ -1,14 +1,15 @@
-import { createStore, combineReducers, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
-import logger from 'redux-logger';
-import Search from './search';
+import { createStore, combineReducers, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk'
+import Search from './search'
 import Auth from './auth'
+import Anime from './anime'
 
 export const ConfigureStore = () => {
     const store = createStore(
         combineReducers({
             search: Search,
-            auth: Auth
+            auth: Auth,
+            anime: Anime
         }), applyMiddleware(thunk)
     );
 

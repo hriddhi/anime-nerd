@@ -3,6 +3,7 @@ import React from 'react';
 import { SearchBar, Input, ThemeProvider } from 'react-native-elements';
 import Home from './HomeComponent';
 import Search from './SearchComponent';
+import Anime from './AnimeComponent'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -46,6 +47,7 @@ class Nav extends React.Component {
           <Stack.Navigator>
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Search" component={Search} options={{ headerLeft: null, headerTitle: () => <SearchBar round={true} onChangeText={this.updateSearch} value={this.state.search} placeholder='Search Anime' platform='android' containerStyle={{backgroundColor: 'transparent'}} /> }} />
+            <Stack.Screen name="Anime" component={Anime} />
           </Stack.Navigator>
         </NavigationContainer>
       
