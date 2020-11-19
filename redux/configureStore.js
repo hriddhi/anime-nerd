@@ -1,17 +1,31 @@
+import AsyncStorage from '@react-native-community/async-storage';
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import Search from './search'
 import Auth from './auth'
 import Anime from './anime'
+import List from './list'
+import { persistStore, persistReducer } from 'redux-persist'
 
-export const ConfigureStore = () => {
-    const store = createStore(
+const persistConfig = {
+    key: 'session',
+    storage: AsyncStorage,
+    whitelist: ['auth'],
+    blacklist: ['anime','search']
+};
+
+const store = createStore(
+    persistReducer(persistConfig,
         combineReducers({
             search: Search,
             auth: Auth,
-            anime: Anime
-        }), applyMiddleware(thunk)
-    );
+            anime: Anime,
+            list: List
+        })
+    ),
+    applyMiddleware(thunk)
+);
 
-    return store;
-}
+const persistor = persistStore(store)
+
+export { persistor, store }

@@ -4,6 +4,7 @@ import { SearchBar, Input, ThemeProvider } from 'react-native-elements';
 import Home from './HomeComponent';
 import Search from './SearchComponent';
 import Anime from './AnimeComponent'
+import Login from './LoginComponent'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -23,7 +24,7 @@ const mapDispatchToProps = (dispatch) => ({
     updateSearch: (str, token) => dispatch(updateSearch(str, token))
 })
 
-class Nav extends React.Component {
+class Main extends React.Component {
 
   state = {
     search: ''
@@ -45,7 +46,7 @@ class Nav extends React.Component {
     return (
         <NavigationContainer>
           <Stack.Navigator>
-            <Stack.Screen name="Home" component={Home} />
+            { this.props.access_token ? <Stack.Screen name="Home" component={Home} /> : <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/> }
             <Stack.Screen name="Search" component={Search} options={{ headerLeft: null, headerTitle: () => <SearchBar round={true} onChangeText={this.updateSearch} value={this.state.search} placeholder='Search Anime' platform='android' containerStyle={{backgroundColor: 'transparent'}} /> }} />
             <Stack.Screen name="Anime" component={Anime} />
           </Stack.Navigator>
@@ -55,4 +56,4 @@ class Nav extends React.Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Nav);
+export default connect(mapStateToProps, mapDispatchToProps)(Main);

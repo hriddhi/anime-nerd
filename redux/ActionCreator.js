@@ -53,3 +53,33 @@ export const fetchAnimeSuccess = (data) => ({
     type: ActionTypes.FETCH_ANIME_SUCCESS,
     payload: data
 })
+
+// ------------------------------------------------
+
+export const fetchUserAnime = (type, token) => (dispatch) => {
+    console.info("In fetchUserAnime")
+    switch(type){
+        case 'watching':
+            axios.get(`http://192.168.56.1:3000/user/watching?token=${token}`)
+            .then((res) => {
+                dispatch(fetchCompleted(res.data))
+            })
+            .catch((err) => {
+                console.error(err.message)
+            })
+
+        case 'completed':
+            axios.get(`http://192.168.56.1:3000/user/completed?token=${token}`)
+            .then((res) => {
+                dispatch(fetchCompleted(res.data))
+            })
+            .catch((err) => {
+                console.error(err.message)
+            })
+    }
+}
+
+export const fetchCompleted = (data) => ({
+    type: ActionTypes.FETCH_USER_COMPLETED_SUCCESS,
+    payload: data
+})

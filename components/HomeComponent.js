@@ -1,58 +1,42 @@
 import React from 'react';
 import { SafeAreaView, StyleSheet, ScrollView, View, Text, StatusBar, Button, Linking } from 'react-native';
 import { connect } from 'react-redux';
-import { getToken } from '../redux/ActionCreator'
+import { getToken, fetchCompleted } from '../redux/ActionCreator'
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+import List from './ListComponent'
 
 const mapStateToProps = state => ({
     auth: state.auth
 })
 
 const mapDispatchToProps = dispatch => ({
-    getToken: (token) => dispatch(getToken(token))
+    getToken: (token) => dispatch(getToken(token)),
+    fetchCompleted: (type) => dispatch(fetchCompleted(type))
 })
+
+const Tab = createMaterialTopTabNavigator()
 
 class Home extends React.Component {
 
-    handleOpenURL = ({ url }) => {
-        if (url.indexOf("?id") !== -1) 
-          if (url)
-            this.props.getToken(url.split('=')[1])
-    };
-
-    componentDidMount(){
-        Linking.addEventListener('url', this.handleOpenURL)
-    }
-
-    componentWillUnmount(){
-        Linking.removeEventListener('url')
-    }
-
     render() { 
         return (
-            <ScrollView contentInsetAdjustmentBehavior='automatic'>
-                <View style={{padding: 16}}>
-                    <View>
-                        <Text>{this.props.auth.access_token}</Text>
-                    </View>
-                    
-                    <View style={{paddingVertical: 8}}>
-                        <Button
-                            title="Login"
-                            onPress={() => Linking.openURL('http://10.0.2.2:3000/auth') }
-                        />
-                    </View>
-
-                    <View style={{paddingVertical: 8}}>
-                        <Button
-                            disabled={ this.props.auth.access_token ? false : true}
-                            title="Go to Search"
-                            onPress={() => this.props.navigation.navigate('Search') }
-                        />
-                    </View>
-                    
-                    
-                </View>
-            </ScrollView>
+            <Tab.Navigator lazy tabBarOptions={{ scrollEnabled: true }}>
+                <Tab.Screen name='Watching'>
+                    {()=><List type='watching'/>}
+                </Tab.Screen>
+                <Tab.Screen name='Plan to Watch'>
+                    {()=><List type='plan'/>}
+                </Tab.Screen>
+                <Tab.Screen name='On Hold'>
+                    {()=><List type='hold'/>}
+                </Tab.Screen>
+                <Tab.Screen name='Dropped'>
+                    {()=><List type='dropped'/>}
+                </Tab.Screen>
+                <Tab.Screen name='Completed'>
+                    {()=><List type='completed'/>}
+                </Tab.Screen>
+            </Tab.Navigator>
         );
     }
 }
