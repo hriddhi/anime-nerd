@@ -10,10 +10,14 @@ export const getToken = (token) => ({
 
 export const updateSearch = (str, token) => (dispatch) => {
     dispatch(updateSearchLoading())
-    axios.get(`http://192.168.56.1:3000/anime/search/${str.replace(' ', '+')}?token=${token}`)
-    .then(res => {
-        //console.log(res.data)
-        dispatch(updateSearchSuccess(res.data))
+    axios.get(`https://api.myanimelist.net/v2/anime?q=${str}&fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics`, {
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    })
+    .then(response => {
+        console.log(response.data)
+        dispatch(updateSearchSuccess(response.data.data))
     })
     .catch(err => {
         console.error(err.message)
@@ -35,7 +39,11 @@ export const fetchAnime = (id, token) => (dispatch) => {
 
     dispatch(fetchAnimeLoading(id))
 
-    axios.get(`http://192.168.56.1:3000/anime/${id}?token=${token}`)
+    axios.get(`https://api.myanimelist.net/v2/anime/${id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics`, {
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    })
     .then((res) => {
         dispatch(fetchAnimeSuccess(res.data))
     })
@@ -54,32 +62,175 @@ export const fetchAnimeSuccess = (data) => ({
     payload: data
 })
 
+// ------------------------------------------
+
+export const updateAnime = (id, props, token) => (dispatch) => {
+    var obj = {}
+    
+    const formdata = []
+    if(props.status !== undefined){
+        formdata.push(`status=${props.status.split('-')[0]}`)
+        obj.status = props.status.split('-')[0]
+    }
+    if(props.episode !== undefined){
+        formdata.push(`num_watched_episodes=${props.episode}`)
+        obj.episode = props.episode
+    }
+
+    dispatch(updateAnimeLoading(id, obj))
+
+    axios.patch(`https://api.myanimelist.net/v2/anime/${id}/my_list_status`, formdata.join('&'), {
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    })
+    .then((res) => {
+        dispatch(updateAnimeSuccess(res.data))
+        if(props.status){
+            dispatch(fetchUserAnime(props.status.split('-')[0], token))
+            props.status.split('-')[1] !== undefined ? dispatch(fetchUserAnime(props.status.split('-')[1], token)) : null
+        }
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
+}
+
+export const updateAnimeLoading = (id, props) => ({
+    type: ActionTypes.UPDATE_ANIME_STATUS_LOADING,
+    payload: { id, ...props }
+})
+
+export const updateAnimeSuccess = (data) => ({
+    type: ActionTypes.UPDATE_ANIME_STATUS_SUCCESS,
+    payload: data
+})
+
 // ------------------------------------------------
 
 export const fetchUserAnime = (type, token) => (dispatch) => {
-    console.info("In fetchUserAnime")
+    //console.info(type)
     switch(type){
         case 'watching':
-            axios.get(`http://192.168.56.1:3000/user/watching?token=${token}`)
-            .then((res) => {
-                dispatch(fetchCompleted(res.data))
+            dispatch(fetchWatchingLoading())
+            axios.get(`https://api.myanimelist.net/v2/users/@me/animelist?status=watching&sort=list_updated_at&limit=1000&fields=my_list_status,num_episodes`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
             })
-            .catch((err) => {
+            .then(res => {
+                dispatch(fetchWatchingSuccess(res.data))
+            })
+            .catch(err => {
                 console.error(err.message)
             })
+            break
+
+        case 'plan_to_watch':
+            dispatch(fetchPlannedLoading())
+            axios.get(`https://api.myanimelist.net/v2/users/@me/animelist?status=plan_to_watch&sort=list_updated_at&limit=1000&fields=my_list_status,num_episodes`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(res => {
+                dispatch(fetchPlanedSuccess(res.data))
+                //console.log(res.data)
+            })
+            .catch(err => {
+                console.error(err.message)
+            })
+            break
+
+        case 'on_hold':
+            dispatch(fetchHoldLoading())
+            axios.get(`https://api.myanimelist.net/v2/users/@me/animelist?status=on_hold&sort=list_updated_at&limit=1000&fields=my_list_status,num_episodes`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(res => {
+                dispatch(fetchHoldSuccess(res.data))
+            })
+            .catch(err => {
+                console.error(err.message)
+            })
+            break
+
+        case 'dropped':
+            dispatch(fetchDroppedLoading())
+            axios.get(`https://api.myanimelist.net/v2/users/@me/animelist?status=dropped&sort=list_updated_at&limit=1000&fields=my_list_status,num_episodes`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(res => {
+                dispatch(fetchDroppedSuccess(res.data))
+            })
+            .catch(err => {
+                console.error(err.message)
+            })
+            break
 
         case 'completed':
-            axios.get(`http://192.168.56.1:3000/user/completed?token=${token}`)
-            .then((res) => {
-                dispatch(fetchCompleted(res.data))
+            dispatch(fetchCompletedLoading())
+            axios.get(`https://api.myanimelist.net/v2/users/@me/animelist?status=completed&sort=list_updated_at&limit=1000&fields=my_list_status,num_episodes`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
             })
-            .catch((err) => {
+            .then(res => {
+                dispatch(fetchCompletedSuccess(res.data))
+            })
+            .catch(err => {
                 console.error(err.message)
             })
+            break
     }
 }
 
-export const fetchCompleted = (data) => ({
+export const fetchWatchingLoading = () => ({
+    type: ActionTypes.FETCH_USER_WATCHING_LOADING
+})
+
+export const fetchPlannedLoading = () => ({
+    type: ActionTypes.FETCH_USER_PLAN_LOADING
+})
+
+export const fetchDroppedLoading = () => ({
+    type: ActionTypes.FETCH_USER_DROPPED_LOADING
+})
+
+export const fetchHoldLoading = () => ({
+    type: ActionTypes.FETCH_USER_HOLD_LOADING
+})
+
+export const fetchCompletedLoading = () => ({
+    type: ActionTypes.FETCH_USER_COMPLETED_LOADING
+})
+
+export const fetchWatchingSuccess = (data) => ({
+    type: ActionTypes.FETCH_USER_WATCHING_SUCCESS,
+    payload: data
+})
+
+export const fetchPlanedSuccess = (data) => ({
+    type: ActionTypes.FETCH_USER_PLAN_SUCCESS,
+    payload: data
+})
+
+export const fetchDroppedSuccess = (data) => ({
+    type: ActionTypes.FETCH_USER_DROPPED_SUCCESS,
+    payload: data
+})
+
+export const fetchHoldSuccess = (data) => ({
+    type: ActionTypes.FETCH_USER_HOLD_SUCCESS,
+    payload: data
+})
+
+export const fetchCompletedSuccess = (data) => ({
     type: ActionTypes.FETCH_USER_COMPLETED_SUCCESS,
     payload: data
 })

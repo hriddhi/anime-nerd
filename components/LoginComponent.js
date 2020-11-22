@@ -40,7 +40,7 @@ class Login extends React.Component {
                     type='outline'
                     titleStyle={styles.buttonText}
                     buttonStyle={styles.buttonStyle}
-                    onPress={() => Linking.openURL('http://10.0.2.2:3000/auth') }
+                    onPress={() => Linking.openURL('https://animenerd.herokuapp.com/auth') }
                 />
                 <Text style={{position: 'absolute', bottom: 16, color: '#fff', fontFamily: 'Roboto-Regular', fontSize: 16}}>Made with <Icon name='heart' type='font-awesome' color='#fff' size={12} /> by a nerd for a nerd</Text>
             </LinearGradient>
