@@ -1,25 +1,21 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import { StatusBar } from 'react-native'
+import { StatusBar, View, Text } from 'react-native'
 import { SearchBar, Input, ThemeProvider, Icon } from 'react-native-elements';
-import Home from './HomeComponent';
-import Search from './SearchComponent';
-import Anime from './AnimeComponent'
-import Login from './LoginComponent'
-import List from './ListComponent'
+import Setting from './SettingComponent'
+import Tab from './TabComponent'
 import { NavigationContainer } from '@react-navigation/native';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import LinearGradient from 'react-native-linear-gradient'
-
-const Stack = createStackNavigator();
-
 import { connect } from 'react-redux';
 import { updateSearch } from '../redux/ActionCreator';
 
 const mapStateToProps = state => {
     return {
         search: state.search,
-        access_token: state.auth.access_token
+        access_token: state.auth.access_token,
+        list: state.list
     }
 }
 
@@ -27,40 +23,32 @@ const mapDispatchToProps = (dispatch) => ({
     updateSearch: (str, token) => dispatch(updateSearch(str, token))
 })
 
+const BottomTab = createMaterialBottomTabNavigator();
+
 class Main extends React.Component {
-
-  state = {
-    search: ''
-  }
-
-  searchRef = React.createRef();
-
-  timer = null;
-
-  componentDidMount() {
-    StatusBar.setBarStyle( 'light-content',true)
-    StatusBar.setBackgroundColor('#17009c')
-  }
-
-  updateSearch = (search) => {
-    this.setState({search})
-    if(search.length > 2){
-      clearTimeout(this.timer);
-      this.timer = setTimeout(() => {
-        this.props.updateSearch(search, this.props.access_token)
-      }, 500);
-    }
-  }
 
   render() {
     return (
       <LinearGradient style={{flex: 1}} colors={['#17009c','#5c007a']}>
-        <NavigationContainer theme={{ colors: { background: 'rgba(0,0,0,0)' } }}>
-          <Stack.Navigator>
-            { this.props.access_token ? <Stack.Screen name="Home" component={Home} options={{ headerTitle: 'HOME', headerTitleStyle: { color: '#fff', fontFamily: 'SpaceGrotesk-Bold' } }}/> : <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/> }
-            <Stack.Screen name="Search" component={Search} options={{ headerShown: false }} />
-            <Stack.Screen name="Anime" component={Anime} options={{ headerTitle: 'ANIME', headerTitleStyle: { color: '#fff', fontFamily: 'SpaceGrotesk-Bold' } }} />
-          </Stack.Navigator>
+        <StatusBar backgroundColor='#17009c' />
+        <NavigationContainer theme={{ colors: { background: 'rgba(0,0,0,0)', labelStyle: { color: '#fff', fontFamily: 'SpaceGrotesk-SemiBold' } } }}>
+          <BottomTab.Navigator activeColor='#fff' inactiveColor='grey' barStyle={{ backgroundColor: 'rgba(0,0,0,0.0)' }}>
+            <BottomTab.Screen name="Home" 
+              component={Tab}
+              options={{ 
+                
+                tabBarLabel: <Text style={{ fontSize: 12, fontFamily: 'SpaceGrotesk-SemiBold' }}>HOME</Text>,
+                tabBarIcon: ({focused}) => <Icon name='home' size={ focused ? 24 : 22 } type='font-awesome' color={ focused ? '#fff' : 'grey' }/>
+              }}
+            />
+            <BottomTab.Screen name="Settings" 
+              component={Setting}
+              options={{ 
+                tabBarLabel: <Text style={{ fontSize: 12, fontFamily: 'SpaceGrotesk-SemiBold' }}>SETTINGS</Text>,
+                tabBarIcon: ({focused}) => <Icon name='gear' size={ focused ? 24 : 22 } type='font-awesome' color={ focused ? '#fff' : 'grey' }/>
+              }}
+            />
+          </BottomTab.Navigator>
         </NavigationContainer>
       </LinearGradient>
     );

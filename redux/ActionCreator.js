@@ -16,7 +16,6 @@ export const updateSearch = (str, token) => (dispatch) => {
         }
     })
     .then(response => {
-        console.log(response.data)
         dispatch(updateSearchSuccess(response.data.data))
     })
     .catch(err => {
@@ -45,7 +44,13 @@ export const fetchAnime = (id, token) => (dispatch) => {
         }
     })
     .then((res) => {
-        dispatch(fetchAnimeSuccess(res.data))
+        axios.get(`https://api.jikan.moe/v3/anime/${id}/characters_staff`)
+        .then((res1) => {
+            dispatch(fetchAnimeSuccess({ ...res.data, ...res1.data }))
+        })
+        .catch((err) => {
+            console.error(err.message)
+        })
     })
     .catch((err) => {
         console.error(err.message)
@@ -65,7 +70,11 @@ export const fetchAnimeSuccess = (data) => ({
 // ------------------------------------------
 
 export const updateAnime = (id, props, token) => (dispatch) => {
-    var obj = {}
+    var obj = {
+        status: null,
+        episode: null,
+        rating: null
+    }
     
     const formdata = []
     if(props.status !== undefined){
@@ -75,6 +84,10 @@ export const updateAnime = (id, props, token) => (dispatch) => {
     if(props.episode !== undefined){
         formdata.push(`num_watched_episodes=${props.episode}`)
         obj.episode = props.episode
+    }
+    if(props.rating !== undefined){
+        formdata.push(`score=${props.rating}`)
+        obj.rating = props.rating
     }
 
     dispatch(updateAnimeLoading(id, obj))
@@ -86,11 +99,12 @@ export const updateAnime = (id, props, token) => (dispatch) => {
         }
     })
     .then((res) => {
-        dispatch(updateAnimeSuccess(res.data))
+        dispatch(updateAnimeSuccess(res.data, id))
         if(props.status){
             dispatch(fetchUserAnime(props.status.split('-')[0], token))
             props.status.split('-')[1] !== undefined ? dispatch(fetchUserAnime(props.status.split('-')[1], token)) : null
         }
+        dispatch(updateListAnimeSuccess(id, res.data))
     })
     .catch((err) => {
         console.error(err.message)
@@ -102,15 +116,42 @@ export const updateAnimeLoading = (id, props) => ({
     payload: { id, ...props }
 })
 
-export const updateAnimeSuccess = (data) => ({
+export const updateAnimeSuccess = (data, id) => ({
     type: ActionTypes.UPDATE_ANIME_STATUS_SUCCESS,
-    payload: data
+    payload: { ...data, id }
+})
+
+export const updateListAnimeSuccess = (id, data) => ({
+    type: ActionTypes.UPDATE_LIST_ANIME_SUCCESS,
+    payload: {...data, id}
+})
+
+// -----------------------------------------------
+
+export const deleteListAnime = (id, status, token) => (dispatch) => {
+    dispatch(deleteListAnimeLoading(id))
+
+    axios.delete(`https://api.myanimelist.net/v2/anime/${id}/my_list_status`, {
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    })
+    .then(res => {
+        dispatch(fetchAnime(id, token))
+        dispatch(fetchUserAnime(status, token))
+    })
+    .catch(err => console.error(err.message))
+}
+
+export const deleteListAnimeLoading = (id) => ({
+    type: ActionTypes.DELETE_LIST_ANIME_LOADING,
+    payload: id
 })
 
 // ------------------------------------------------
 
 export const fetchUserAnime = (type, token) => (dispatch) => {
-    //console.info(type)
+    console.info(type)
     switch(type){
         case 'watching':
             dispatch(fetchWatchingLoading())
@@ -136,7 +177,6 @@ export const fetchUserAnime = (type, token) => (dispatch) => {
             })
             .then(res => {
                 dispatch(fetchPlanedSuccess(res.data))
-                //console.log(res.data)
             })
             .catch(err => {
                 console.error(err.message)

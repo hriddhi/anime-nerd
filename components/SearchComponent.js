@@ -21,12 +21,6 @@ class Search extends React.Component {
     search: ''
   }
 
-  componentDidMount() {
-    this.searchRef.focus()
-  }
-
-  searchRef = React.createRef();
-
   timer = null;
 
   updateSearch = (search) => {
@@ -40,20 +34,12 @@ class Search extends React.Component {
   }
 
     viewAnime = (id) => {
-      if(this.props.anime.id !== id)
-        this.props.fetchAnime(id, this.props.token)
-      this.props.navigation.navigate('Anime')
+      this.props.navigation.navigate('Anime', { id })
     }
 
     render() {
-        return (<>
-              <Header
-                leftContainerStyle={{display: 'none'}}
-                centerComponent={<SearchBar ref={search => this.searchRef = search} round={true} onChangeText={this.updateSearch} value={this.state.search} placeholder='Search Anime' platform='android' leftIcon={{ color: '#fff' }} containerStyle={{ backgroundColor: 'transparent' }} showLoading={this.props.search.isLoading} loadingProps={{color: '#fff'}} inputStyle={{ color: '#fff' }} searchIcon={{color: '#fff'}} cancelIcon={{color: '#fff'}} clearIcon={{color: '#fff'}} />}
-                rightContainerStyle={{display: 'none'}}
-                backgroundColor='transparent'
-              />
-            <ScrollView style={{paddingTop: 4}}>
+        return (
+            <ScrollView style={{ paddingVertical: 4 }}>
               { this.props.search.visible ? 
                 this.props.search.result.map((l, i) => (
                   <TouchableOpacity activeOpacity={0.7} key={i} onPress={()=>this.viewAnime(l.node.id)}>
@@ -73,7 +59,6 @@ class Search extends React.Component {
                 : null
               }
             </ScrollView>
-            </>
         );
     }
 }

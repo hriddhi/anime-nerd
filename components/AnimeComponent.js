@@ -2,8 +2,11 @@ import React from 'react';
 import { StyleSheet, ScrollView, View, Text, ActivityIndicator, ImageBackground, Modal, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { Avatar, ListItem, Image, Badge, Button, Icon, Divider } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { updateAnime } from '../redux/ActionCreator'
+import { updateAnime, fetchAnime, deleteListAnime } from '../redux/ActionCreator'
 import LinearGradient from 'react-native-linear-gradient'
+import { WheelPicker } from 'react-native-wheel-picker-android'
+import TextTicker from 'react-native-text-ticker'
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 
 const mapStateToProps = state => ({
     anime: state.anime,
@@ -11,39 +14,59 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-    updateAnime: (id, status, token) => dispatch(updateAnime(id, status, token))
+    updateAnime: (id, status, token) => dispatch(updateAnime(id, status, token)),
+    fetchAnime: (type, token) => dispatch(fetchAnime(type, token)),
+    deleteListAnime: (id, status, token) => dispatch(deleteListAnime(id, status, token))
 })
 
-class Anime extends React.Component {
+class Detail extends React.Component {
 
     state = {
-        modalVisibleStatus: false,
-        modalVisibleEpisodes: false,
-        num_episodes_watched:  this.props.anime.anime === null ? 0 : this.props.anime.anime.my_list_status ? this.props.anime.anime.my_list_status.num_episodes_watched : null,
-        flag: true
+        modal_status: false,
+        modal_episode: false,
+        modal_rating: false,
+        num_episodes_watched_changed: false,
+        rating_changed: false,
+        show_more_info: false,
+        show_more_synopsis: false,
+        related_scroll_id: null,
+        recom_scroll_id: null
     };
 
-    componentDidUpdate() {
-        if(this.props.anime.anime.my_list_status && this.props.anime.anime !== null && this.state.flag)
-            this.setState({ num_episodes_watched: this.props.anime.anime.my_list_status.num_episodes_watched , flag: false})
-    }
-    
-    setmodalVisibleStatus = () => {
-        this.setState({ modalVisibleStatus: !this.state.modalVisibleStatus });
+    componentDidMount() {
+        this.props.fetchAnime(this.props.route.params.id, this.props.access_token)
     }
 
-    setmodalVisibleEpisodes = () => {
-        this.setState({ modalVisibleEpisodes: !this.state.modalVisibleEpisodes });
-        if(this.props.anime.anime.my_list_status && this.state.num_episodes_watched !== this.props.anime.anime.my_list_status.num_episodes_watched)
-            this.props.updateAnime(this.props.anime.id, { episode: this.state.num_episodes_watched }, this.props.access_token)
-        if(this.props.anime.anime.my_list_status && this.state.num_episodes_watched !== this.props.anime.anime.my_list_status.num_episodes_watched && this.props.anime.anime.my_list_status.num_episodes_watched === 0)
-            this.props.updateAnime(this.props.anime.id, { status: `watching-${this.props.anime.anime.my_list_status.status}`, episode: this.state.num_episodes_watched }, this.props.access_token)
-        if(this.props.anime.anime.my_list_status && this.state.num_episodes_watched !== this.props.anime.anime.my_list_status.num_episodes_watched && this.state.num_episodes_watched === this.props.anime.anime.num_episodes)
-            this.props.updateAnime(this.props.anime.id, { status: `completed-${this.props.anime.anime.my_list_status.status}`, episode: this.state.num_episodes_watched }, this.props.access_token)
+    viewAnime = (id) => {
+        this.props.navigation.push('Anime', { id })
+    }
+    
+    setmodal_status = () => {
+        this.setState({ modal_status: !this.state.modal_status });
+    }
+
+    setmodal_episode = () => {
+        this.setState({ modal_episode: !this.state.modal_episode });
+        if(this.props.anime[this.props.route.params.id].anime.my_list_status && this.state.num_episodes_watched_changed !== false)
+            this.props.updateAnime(this.props.anime[this.props.route.params.id].id, { episode: this.state.num_episodes_watched_changed }, this.props.access_token)
+        if(this.props.anime[this.props.route.params.id].anime.my_list_status && this.state.num_episodes_watched_changed !== false && this.props.anime[this.props.route.params.id].anime.my_list_status.num_episodes_watched === 0)
+            this.props.updateAnime(this.props.anime[this.props.route.params.id].id, { status: `watching-${this.props.anime[this.props.route.params.id].anime.my_list_status.status}`, episode: this.state.num_episodes_watched_changed }, this.props.access_token)
+        if(this.props.anime[this.props.route.params.id].anime.my_list_status && this.state.num_episodes_watched_changed !== false && this.state.num_episodes_watched_changed === this.props.anime[this.props.route.params.id].anime.num_episodes)
+            this.props.updateAnime(this.props.anime[this.props.route.params.id].id, { status: `completed-${this.props.anime[this.props.route.params.id].anime.my_list_status.status}`, episode: this.state.num_episodes_watched_changed }, this.props.access_token)
+        if(this.state.num_episodes_watched_changed !== false)
+            this.setState({ num_episodes_watched_changed: false })
+    }
+
+    setmodal_rating = () => {
+        this.setState({ modal_rating: !this.state.modal_rating });
+        if(this.props.anime[this.props.route.params.id].anime.my_list_status && this.state.rating_changed !== false)
+            this.props.updateAnime(this.props.anime[this.props.route.params.id].id, { rating: this.state.rating_changed }, this.props.access_token)
+        if(this.state.rating_changed !== false)
+            this.setState({ rating_changed: false })
     }
 
     getStatus = () => {
-        var status = this.props.anime.anime.my_list_status.status
+        var status = this.props.anime[this.props.route.params.id].anime.my_list_status.status
         if(status === 'watching')
             return 'Watching'
         else if(status === 'plan_to_watch')
@@ -57,51 +80,69 @@ class Anime extends React.Component {
     }
 
     render() {
-
-        const anime = this.props.anime.anime
-
-        if(anime === null){
+        
+        if(this.props.anime[this.props.route.params.id] === undefined || this.props.anime[this.props.route.params.id].isLoading){
             return (
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <ActivityIndicator size='large' color='#fff'/>
                 </View>
             )
         } else {
+            const anime = this.props.anime[this.props.route.params.id].anime
+
+            var info = {
+                'Episodes': anime.num_episodes,
+                'Rank': `#${anime.rank}`,
+                'Popularity': `#${anime.popularity}`,
+                'Score': anime.mean,
+                'Type': anime.media_type,
+                'Episode duration': `${Math.floor(anime.average_episode_duration / 60)} min per ep`,
+                'Rating': anime.rating,
+                'Status': anime.status,
+                'Start date': anime.start_date,
+                'End date': anime.end_date,
+                'Source': anime.source,
+                'Studio': anime.studio ? anime.studios[0].name : ' - ',
+                'Season': anime.start_season ? `${anime.start_season.season}, ${anime.start_season.year}` : '???',
+                'NSFW': anime.nsfw
+
+            }
+
             return (  
                 <ImageBackground source={{ uri: anime.main_picture.large }} style={styles.image}>
-                    <LinearGradient style={{flex: 1}} colors={['#17009c', 'rgba(173,173,173,0.8)','#17009c']}>
+                    <LinearGradient style={{flex: 1}} colors={['#17009c', 'rgba(173,173,173,0.8)','#5c007a']}>
                         <ScrollView>
-                            <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.6)', margin: 8, borderRadius: 10}}>
+                            <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.7)', margin: 8, borderRadius: 10}}>
                                 <Image source={{ uri: anime.main_picture.large }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 115, height: 170, flex: 1, borderBottomLeftRadius: 10, borderTopLeftRadius: 10 }}/>
-                                <View style={{flex: 1, padding: 8}}>
+                                <View style={{flex: 1, paddingHorizontal: 8, paddingVertical: 4}}>
                                     <Text numberOfLines={2} style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 18 }}>{anime.title}</Text>
+                                    <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Medium', fontSize: 10, marginTop: -2 }}>{anime.alternative_titles.ja}</Text>
                                     <View style={{flexDirection: 'row', flexWrap: 'wrap', marginTop: 4}}>
                                         {
                                             anime.genres.map((val,i) => {
                                                 return (
-                                                    <Text key={i} style={{ fontSize: 12, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 4, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 50}}>{val.name}</Text>
+                                                    <Text key={i} style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 50}}>{val.name}</Text>
                                                 )
                                             })
                                         }
-                                        
                                     </View>
                                 </View>
                             </View>
                             {
                                 (() => {
-                                    if(this.props.anime.anime.my_list_status){
+                                    if(this.props.anime[this.props.route.params.id].anime.my_list_status){
                                         return (
                                             <View>
-                                                <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.6)', marginHorizontal: 8, marginBottom: 8, borderRadius: 36 }}>
+                                                <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.7)', marginHorizontal: 8, marginBottom: 8, borderRadius: 36 }}>
                                                     <View style={{margin: 8, flex: 1, flexGrow: 2}}>
                                                         <Button title={ this.getStatus() } 
                                                             type='outline' 
                                                             titleStyle={styles.buttonText} 
                                                             buttonStyle={styles.buttonStyle} 
-                                                            onPress={this.setmodalVisibleStatus}
+                                                            onPress={this.setmodal_status}
                                                             icon={ <Icon name="angle-down"  type='font-awesome' size={18} color="black" style={{ paddingLeft: 8 }}  /> } 
                                                             iconRight={true}
-                                                            loading={this.props.anime.isUpdating.id === this.props.anime.id && this.props.anime.isUpdating.status ? true : false} 
+                                                            loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.status ? true : false} 
                                                             loadingProps={{color: '#000'}}
                                                         />
                                                     </View>
@@ -111,21 +152,28 @@ class Anime extends React.Component {
                                                             type='outline' 
                                                             titleStyle={styles.buttonText} 
                                                             buttonStyle={styles.buttonStyleSeen}
-                                                            onPress={this.setmodalVisibleEpisodes}
+                                                            onPress={this.setmodal_episode}
                                                             icon={ <Icon name="eye" type='font-awesome' size={18} color="black" style={{ paddingLeft: 10 }} /> } 
                                                             iconRight={true}
-                                                            loading={this.props.anime.isUpdating.id === this.props.anime.id && this.props.anime.isUpdating.episode ? true : false} 
+                                                            loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.episode !== null ? true : false} 
                                                             loadingProps={{color: '#000'}}
                                                         />
-                                                        </View>
+                                                    </View>
                                                     <View style={{marginVertical: 8, marginRight: 8, flex: 1}}>
-                                                        <Button title={anime.my_list_status.score === 0 ? '-' : `${anime.my_list_status.score}`} type='outline' titleStyle={styles.buttonText} buttonStyle={styles.buttonStyleRating}
-                                                            icon={ <Icon name="thumbs-up" type='font-awesome' size={18} color="black" style={{ paddingLeft: 10 }} /> } iconRight={true}
+                                                        <Button title={anime.my_list_status.score === 0 ? '-' : `${anime.my_list_status.score}`} 
+                                                            type='outline' 
+                                                            titleStyle={styles.buttonText} 
+                                                            buttonStyle={styles.buttonStyleRating}
+                                                            icon={ <Icon name="thumbs-up" type='font-awesome' size={18} color="black" style={{ paddingLeft: 10 }} /> } 
+                                                            iconRight={true}
+                                                            loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.rating !== null ? true : false} 
+                                                            loadingProps={{color: '#000'}}
+                                                            onPress={this.setmodal_rating}
                                                         />
                                                     </View>
                                                 </View>
-                                                <Modal animationType="fade" transparent={true} visible={this.state.modalVisibleStatus} onRequestClose={this.setmodalVisibleStatus}>
-                                                    <TouchableOpacity style={styles.centeredView} activeOpacity={1} onPressOut={this.setmodalVisibleStatus}>
+                                                <Modal animationType="fade" transparent={true} visible={this.state.modal_status} onRequestClose={this.setmodal_status}>
+                                                    <TouchableOpacity style={styles.centeredView} activeOpacity={1} onPressOut={this.setmodal_status}>
                                                     <TouchableWithoutFeedback>
                                                         <View style={styles.modalView}>
                                                             <Text style={styles.modalHeading}>Set your status</Text>
@@ -134,8 +182,8 @@ class Anime extends React.Component {
                                                                 type={ anime.my_list_status.status === 'watching' ? 'solid' : 'outline' } 
                                                                 titleStyle={styles.buttonText} 
                                                                 buttonStyle={ anime.my_list_status.status === 'watching' ? styles.modalStatusButtonsActive : styles.modalStatusButtons } 
-                                                                onPress={()=>this.props.updateAnime(this.props.anime.id, { status : `watching-${this.props.anime.anime.my_list_status.status}` }, this.props.access_token)} 
-                                                                loading={this.props.anime.isUpdating.id === this.props.anime.id && this.props.anime.isUpdating.status === 'watching' ? true : false} 
+                                                                onPress={() => this.props.updateAnime(this.props.anime[this.props.route.params.id].id, { status : `watching-${this.props.anime[this.props.route.params.id].anime.my_list_status.status}` }, this.props.access_token)} 
+                                                                loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.status === 'watching' ? true : false} 
                                                                 loadingProps={{color: '#000'}}
                                                             />
                                                             </View>
@@ -144,8 +192,8 @@ class Anime extends React.Component {
                                                                 type={ anime.my_list_status.status === 'plan_to_watch' ? 'solid' : 'outline' } 
                                                                 titleStyle={styles.buttonText} 
                                                                 buttonStyle={ anime.my_list_status.status === 'plan_to_watch' ? styles.modalStatusButtonsActive : styles.modalStatusButtons } 
-                                                                onPress={()=>this.props.updateAnime(this.props.anime.id, { status: `plan_to_watch-${this.props.anime.anime.my_list_status.status}` }, this.props.access_token)}
-                                                                loading={this.props.anime.isUpdating.id === this.props.anime.id && this.props.anime.isUpdating.status === 'plan_to_watch' ? true : false} 
+                                                                onPress={() => this.props.updateAnime(this.props.anime[this.props.route.params.id].id, { status: `plan_to_watch-${this.props.anime[this.props.route.params.id].anime.my_list_status.status}` }, this.props.access_token)}
+                                                                loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.status === 'plan_to_watch' ? true : false} 
                                                                 loadingProps={{color: '#000'}}
                                                             />
                                                             </View>
@@ -154,8 +202,8 @@ class Anime extends React.Component {
                                                                 type={ anime.my_list_status.status === 'on_hold' ? 'solid' : 'outline' } 
                                                                 titleStyle={styles.buttonText} 
                                                                 buttonStyle={ anime.my_list_status.status === 'on_hold' ? styles.modalStatusButtonsActive : styles.modalStatusButtons } 
-                                                                onPress={()=>this.props.updateAnime(this.props.anime.id, { status: `on_hold-${this.props.anime.anime.my_list_status.status}`}, this.props.access_token)} 
-                                                                loading={this.props.anime.isUpdating.id === this.props.anime.id && this.props.anime.isUpdating.status === 'on_hold' ? true : false} 
+                                                                onPress={()=>this.props.updateAnime(this.props.anime[this.props.route.params.id].id, { status: `on_hold-${this.props.anime[this.props.route.params.id].anime.my_list_status.status}`}, this.props.access_token)} 
+                                                                loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.status === 'on_hold' ? true : false} 
                                                                 loadingProps={{color: '#000'}}
                                                             />
                                                             </View>
@@ -164,8 +212,8 @@ class Anime extends React.Component {
                                                                 type={ anime.my_list_status.status === 'dropped' ? 'solid' : 'outline' } 
                                                                 titleStyle={styles.buttonText} 
                                                                 buttonStyle={ anime.my_list_status.status === 'dropped' ? styles.modalStatusButtonsActive : styles.modalStatusButtons } 
-                                                                onPress={()=>this.props.updateAnime(this.props.anime.id, { status: `dropped-${this.props.anime.anime.my_list_status.status}`}, this.props.access_token)} 
-                                                                loading={this.props.anime.isUpdating.id === this.props.anime.id && this.props.anime.isUpdating.status === 'dropped' ? true : false} 
+                                                                onPress={()=>this.props.updateAnime(this.props.anime[this.props.route.params.id].id, { status: `dropped-${this.props.anime[this.props.route.params.id].anime.my_list_status.status}`}, this.props.access_token)} 
+                                                                loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.status === 'dropped' ? true : false} 
                                                                 loadingProps={{color: '#000'}}
                                                             />
                                                             </View>
@@ -174,8 +222,8 @@ class Anime extends React.Component {
                                                                 type={ anime.my_list_status.status === 'completed' ? 'solid' : 'outline' } 
                                                                 titleStyle={styles.buttonText} 
                                                                 buttonStyle={ anime.my_list_status.status === 'completed' ? styles.modalStatusButtonsActive : styles.modalStatusButtons } 
-                                                                onPress={()=>this.props.updateAnime(this.props.anime.id, { status: `completed-${this.props.anime.anime.my_list_status.status}`}, this.props.access_token)} 
-                                                                loading={this.props.anime.isUpdating.id === this.props.anime.id && this.props.anime.isUpdating.status === 'completed' ? true : false} 
+                                                                onPress={()=>this.props.updateAnime(this.props.anime[this.props.route.params.id].id, { status: `completed-${this.props.anime[this.props.route.params.id].anime.my_list_status.status}`}, this.props.access_token)} 
+                                                                loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime.id && this.props.anime[this.props.route.params.id].isUpdating.status === 'completed' ? true : false} 
                                                                 loadingProps={{color: '#000'}}
                                                             />
                                                             </View>
@@ -183,113 +231,228 @@ class Anime extends React.Component {
                                                         </TouchableWithoutFeedback>
                                                     </TouchableOpacity>
                                                 </Modal>
-                                                <Modal animationType="fade" transparent={true} visible={this.state.modalVisibleEpisodes} onRequestClose={this.setmodalVisibleEpisodes}>
-                                                    
-                                                    <TouchableOpacity style={styles.centeredView} onPressOut={this.setmodalVisibleEpisodes} activeOpacity={1}>
+                                                <Modal animationType="fade" transparent={true} visible={this.state.modal_episode} onRequestClose={this.setmodal_episode}>
+                                                    <TouchableOpacity style={styles.centeredView} onPressOut={this.setmodal_episode} activeOpacity={1}>
                                                         <TouchableWithoutFeedback>
-                                                        <View style={styles.modalViewEpisodes}>
-                                                            <Text style={styles.modalHeading}>Set Episodes Watched</Text>
-                                                            <ScrollView>
-                                                            <View style={{flexDirection: 'row', flexWrap: 'wrap', marginTop: 4}}>
-                                                                
-                                                            {   
-                                                                [...Array(anime.num_episodes + 1)].map((_,i) => {
-                                                                    return (
-                                                                        <View key={i} style={{margin: 4}}>
-                                                                            <Button title={`${i}`} 
-                                                                                type='solid' 
-                                                                                onPress={() => this.setState({ num_episodes_watched: i }) }
-                                                                                buttonStyle={{borderRadius: 20, width: 40, height: 40, borderColor: '#3b3b3b', borderWidth: 1, backgroundColor: i <= this.state.num_episodes_watched ? '#a1a1a1' : 'transparent'}} 
-                                                                                titleStyle={{color: '#000', fontFamily: 'SpaceGrotesk-Medium'}} 
-                                                                            /> 
-                                                                        </View>
-                                                                    )
-                                                                })
-                                                            }
-                                                            
-                                                        </View>
-                                                        </ScrollView>
-                                                        </View>
+                                                            <View style={styles.modalViewEpisodes}>
+                                                                <Text style={styles.modalHeading}>Set Ep Watched</Text>
+                                                                <View>
+                                                                    <WheelPicker 
+                                                                        selectedItemTextFontFamily='SpaceGrotesk-Bold' 
+                                                                        itemTextFontFamily='SpaceGrotesk-SemiBold' 
+                                                                        selectedItem={anime.my_list_status.num_episodes_watched} 
+                                                                        data={ [...Array(anime ? anime.num_episodes + 1 : 1).keys()].map(String) } 
+                                                                        onItemSelected={ (val) => { if(anime.my_list_status.num_episodes_watched !== val) this.setState({ num_episodes_watched_changed: val }) }} 
+                                                                    />
+                                                                </View>
+                                                            </View>
                                                         </TouchableWithoutFeedback>
                                                     </TouchableOpacity>
-                                                    
+                                                </Modal>
+                                                <Modal animationType="fade" transparent={true} visible={this.state.modal_rating} onRequestClose={this.setmodal_rating}>
+                                                    <TouchableOpacity style={styles.centeredView} onPressOut={this.setmodal_rating} activeOpacity={1}>
+                                                        <TouchableWithoutFeedback>
+                                                            <View style={styles.modalViewEpisodes}>
+                                                                <Text style={styles.modalHeading}>Set Rating</Text>
+                                                                <View>
+                                                                    <WheelPicker
+                                                                        selectedItemTextFontFamily='SpaceGrotesk-Bold' 
+                                                                        itemTextFontFamily='SpaceGrotesk-SemiBold' 
+                                                                        selectedItem={anime.my_list_status.score} 
+                                                                        data={ ['0 Not Rated', '1 Appalling', '2 Horrible', '3 Very Bad', '4 Bad', '5 Average', '6 Fine', '7 Good', '8 Very Good', '9 Great', '10 Masterpiece'] } 
+                                                                        onItemSelected={ (val) => { if(anime.my_list_status.score !== val) this.setState({ rating_changed : val }) } } 
+                                                                    />
+                                                                </View>
+                                                            </View>
+                                                        </TouchableWithoutFeedback>
+                                                    </TouchableOpacity>
                                                 </Modal>
                                             </View>
                                         )
                                     } else {
                                         return (
                                             <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.6)', marginHorizontal: 8, marginBottom: 8, borderRadius: 36 }}>
-                                                <View style={{margin: 8}}>
+                                                <View style={{margin: 8, flex: 1, flexGrow: 2}}>
                                                     <Button title='Add to Profile' 
                                                         type='outline' 
                                                         titleStyle={styles.buttonText} 
                                                         buttonStyle={styles.buttonStyleAddProfile} 
                                                         icon={ <Icon name="plus"  type='font-awesome' size={18} color="black" style={{ paddingRight: 16 }}  /> } 
-                                                        loading={this.props.anime.isUpdating.id === this.props.anime.id && this.props.anime.isUpdating.status ? true : false} 
+                                                        loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.status ? true : false} 
                                                         loadingProps={{color: '#000'}}
-                                                        onPress={()=>this.props.updateAnime(this.props.anime.id, { status : `plan_to_watch` }, this.props.access_token)} 
+                                                        onPress={()=>this.props.updateAnime(this.props.anime[this.props.route.params.id].id, { status : `plan_to_watch` }, this.props.access_token)} 
                                                     />
                                                 </View>
-                                                
-                                                
                                             </View>
                                         )
                                     }
                                 })()
                             }
 
-                            <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.6)', margin: 8, borderRadius: 10}}>
-                                <Text style={{fontSize: 16, fontFamily: 'SpaceGrotesk-Bold'}}>Info</Text>
-                                <View style={{flexDirection: 'row', padding: 2}}>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14}}>Episodes</Text>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14, textAlign: 'right'}}></Text>
-                                </View>
-                                <Divider style={{backgroundColor: 'grey'}} />
-                                <View style={{flexDirection: 'row', padding: 2}}>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14}}>Episodes</Text>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14, textAlign: 'right'}}></Text>
-                                </View>
-                                <Divider style={{backgroundColor: 'grey'}} />
-                                <View style={{flexDirection: 'row', padding: 2}}>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14}}>Episodes</Text>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14, textAlign: 'right'}}></Text>
-                                </View>
-                                <Divider style={{backgroundColor: 'grey'}} />
-                                <View style={{flexDirection: 'row', padding: 2}}>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14}}>Episodes</Text>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14, textAlign: 'right'}}></Text>
-                                </View>
-                                <Divider style={{backgroundColor: 'grey'}} />
-                                <View style={{flexDirection: 'row', padding: 2}}>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14}}>Episodes</Text>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14, textAlign: 'right'}}></Text>
-                                </View>
-                                <Divider style={{backgroundColor: 'grey'}} />
-                                <View style={{flexDirection: 'row', padding: 2}}>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14}}>Episodes</Text>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14, textAlign: 'right'}}></Text>
-                                </View>
-                                <Divider style={{backgroundColor: 'grey'}} />
-                                <View style={{flexDirection: 'row', padding: 2}}>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14}}>Episodes</Text>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14, textAlign: 'right'}}></Text>
-                                </View>
-                                <Divider style={{backgroundColor: 'grey'}} />
-                                <View style={{flexDirection: 'row', padding: 2}}>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14}}>Episodes</Text>
-                                    <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14, textAlign: 'right'}}></Text>
-                                </View>
-                                <Divider style={{backgroundColor: 'grey'}} />
+                            <View style={{flex: 1, backgroundColor: 'rgba(255,255,255,0.7)', padding: 12, marginHorizontal: 8, borderRadius: 10}}>
+                                <Text style={{fontSize: 18, fontFamily: 'SpaceGrotesk-Bold'}}>Info</Text>
+                                {
+                                    Object.keys(info).map((val,i)=> {
+                                        if(i < 8 || this.state.show_more_info){
+                                            return (
+                                                <View key={i} style={{ paddingHorizontal: 4}}>
+                                                    <View style={{ flex: 1, flexGrow: 1, flexDirection: 'row', paddingVertical: 4 }}>
+                                                        <View style={{ flex: 1, flexGrow: 1 }}>
+                                                            <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14}}>{val}</Text>
+                                                        </View>
+                                                        <View style={{ flex: 1, flexGrow: 1 }}>
+                                                            <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 14, textAlign: 'right'}}>{info[val]}</Text>
+                                                        </View>
+                                                    </View>
+                                                    <Divider style={{ backgroundColor: 'grey'}} />
+                                                </View>
+                                            )
+                                        }
+                                    })
+                                }
+                                <Text onPress={() => this.setState({ show_more_info: !this.state.show_more_info })} style={{fontSize: 14, fontFamily: 'SpaceGrotesk-Bold', textAlign: 'center', textDecorationLine: 'underline', marginBottom: -8, padding: 8}}>Show { this.state.show_more_info ? 'less' : 'more' }</Text>
                             </View>
-                            
-                            <View style={{width: 400, height: 600, backgroundColor: 'rgba(0,0,0,0)'}}>
 
-                            </View>           
+                            <View style={{flex: 1, backgroundColor: 'rgba(255,255,255,0.7)', padding: 12, margin: 8, marginBottom: 0, borderRadius: 10}}>
+                                <Text style={{fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingBottom: 8}}>Synopsis</Text>
+                                <Text numberOfLines={this.state.show_more_synopsis ? null : 4 } style={{ textAlign: 'justify', fontSize: 14, fontFamily: 'SpaceGrotesk-Medium', paddingHorizontal: 4}}>{anime.synopsis}</Text>
+                                <Text onPress={() => this.setState({ show_more_synopsis: !this.state.show_more_synopsis })} style={{fontSize: 14, fontFamily: 'SpaceGrotesk-Bold', textAlign: 'center', textDecorationLine: 'underline', marginBottom: -8, padding: 8}}>Show { this.state.show_more_synopsis ? 'less' : 'more' }</Text>
+                            </View>
+
+                            <View horizontal style={{flex: 1, height: 198, backgroundColor: 'rgba(255,255,255,0.7)', marginTop: 8, marginHorizontal: 8, borderRadius: 10}}>
+                                <Text style={{ fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingLeft: 12, padding: 8 }}>Characters</Text>
+                                <ScrollView showsHorizontalScrollIndicator={false} horizontal 
+                                    style={{ left: 0, bottom: 8, position: 'absolute', marginHorizontal: -12 }}
+                                    contentContainerStyle={{ paddingHorizontal: 18 }}    
+                                >
+                                {
+                                    anime.characters.map((l,i) => (
+                                        <TouchableOpacity activeOpacity={0.9} key={i} >
+                                            <View style={{ marginHorizontal: 4, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
+                                                <Image source={{ uri: l.image_url }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 100, height: 150, flex: 1 }}/>
+                                                <View style={{ padding: 4, position: 'absolute', bottom: 0, backgroundColor: 'rgba(255,255,255,0.9)', width: '100%', zIndex: 1 }}>
+                                                    <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}>{l.name.split(', ')[1] + ' ' + l.name.split(', ')[0]}</Text>
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))
+                                }
+                                </ScrollView>
+                            </View>
+
+                            <View horizontal style={{flex: 1, height: 228, backgroundColor: 'rgba(255,255,255,0.7)', margin: 8, marginBottom: 0, borderRadius: 10}}>
+                                <Text style={{ fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingLeft: 12, padding: 8 }}>Related Anime</Text>
+                                <ScrollView showsHorizontalScrollIndicator={false} horizontal 
+                                    style={{ left: 0, bottom: 8, position: 'absolute', marginHorizontal: -12 }}
+                                    contentContainerStyle={{ paddingHorizontal: 18 }}    
+                                >
+                                {
+                                    anime.related_anime.map((l,i) => (
+                                        <TouchableOpacity activeOpacity={0.9} key={i} onPress={()=>this.viewAnime(l.node.id)} onPressIn={()=>this.setState({ related_scroll_id: l.node.id })} onPressOut={()=>this.setState({ related_scroll_id: null })}>
+                                            <View style={{ marginHorizontal: 4, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
+                                                <Image source={{ uri: l.node.main_picture.large }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 120, height: 180, flex: 1 }}/>
+                                                <View style={{ padding: 4, position: 'absolute', bottom: 0, backgroundColor: 'rgba(255,255,255,0.9)', width: '100%', zIndex: 1 }}>
+                                                    <TextTicker
+                                                        numberOfLines={1}
+                                                        style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}
+                                                        duration={3000}
+                                                        loop
+                                                        bounce
+                                                        repeatSpacer={50}
+                                                        marqueeDelay={200}
+                                                        disabled={ this.state.related_scroll_id === l.node.id ? false : true }
+                                                    >
+                                                        {l.node.title}
+                                                    </TextTicker>
+                                                    <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Medium', fontSize: 10 }}>{l.relation_type_formatted}</Text>
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))
+                                }
+                                </ScrollView>
+                            </View>
+                                 
+                            <View horizontal style={{flex: 1, height: 228, backgroundColor: 'rgba(255,255,255,0.7)', margin: 8, borderRadius: 10}}>
+                                <Text style={{ fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingLeft: 12, padding: 8 }}>Recommendations</Text>
+                                <ScrollView showsHorizontalScrollIndicator={false} horizontal 
+                                    style={{ left: 0, bottom: 8, position: 'absolute', marginHorizontal: -12 }}
+                                    contentContainerStyle={{ paddingHorizontal: 18 }}    
+                                >
+                                {
+                                    anime.recommendations.map((l,i) => (
+                                        <TouchableOpacity activeOpacity={0.9} key={i} onPress={()=>this.viewAnime(l.node.id)} onPressIn={()=>this.setState({ recom_scroll_id: l.node.id })} onPressOut={()=>this.setState({ recom_scroll_id: null })}>
+                                            <View style={{ marginHorizontal: 4, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
+                                                <Image source={{ uri: l.node.main_picture.large }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 120, height: 180, flex: 1 }}/>
+                                                <View style={{ padding: 4, position: 'absolute', bottom: 0, backgroundColor: 'rgba(255,255,255,0.9)', width: '100%', zIndex: 1 }}>
+                                                    {/* <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}>{l.node.title}</Text> */}
+                                                    <TextTicker
+                                                        numberOfLines={1}
+                                                        style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}
+                                                        duration={3000}
+                                                        loop
+                                                        bounce
+                                                        repeatSpacer={50}
+                                                        marqueeDelay={200}
+                                                        disabled={ this.state.recom_scroll_id === l.node.id ? false : true }
+                                                    >
+                                                        {l.node.title}
+                                                    </TextTicker>
+                                                </View>
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))
+                                }
+                                </ScrollView>
+                            </View>
+
+                            {
+                                (() => {
+                                    if(this.props.anime[this.props.route.params.id].anime.my_list_status)
+                                        return (
+                                            <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.7)', marginHorizontal: 8, marginBottom: 8, borderRadius: 36 }}>
+                                                <View style={{margin: 8, flex: 1, flexGrow: 1}}>
+                                                    <Button title='Delete from Profile' 
+                                                        type='outline' 
+                                                        titleStyle={styles.buttonText} 
+                                                        buttonStyle={styles.buttonStyleAddProfile} 
+                                                        icon={ <Icon name="trash" type='font-awesome' size={18} color="black" style={{ paddingRight: 16 }}  /> } 
+                                                        loading={this.props.anime[this.props.route.params.id].isDeleting ? true : false} 
+                                                        loadingProps={{color: '#000'}}
+                                                        onPress={()=>this.props.deleteListAnime(this.props.anime[this.props.route.params.id].id, this.props.anime[this.props.route.params.id].anime.my_list_status.status, this.props.access_token)} 
+                                                    />
+                                                </View>
+                                            </View>
+                                        )
+                                })()
+                            }
+                            
                         </ScrollView>
                     </LinearGradient>
                 </ImageBackground>
             );
         }
+    }
+}
+
+const Tab = createMaterialTopTabNavigator()
+
+class Anime extends React.Component {
+
+    render() {
+        <Tab.Navigator backBehavior="none" lazy 
+            sceneContainerStyle={{backgroundColor: 'transparent'}} 
+            style={{ backgroundColor: 'transparent' }} 
+            tabBarOptions={{ indicatorStyle: { borderBottomWidth: 5, borderColor: '#fff' }, scrollEnabled: true, labelStyle: { color: '#fff', fontFamily: 'SpaceGrotesk-SemiBold' }, style: { backgroundColor: 'transparent' } }} 
+        >
+            <Tab.Screen name='details' options={{ title: 'Details' }}>
+                {() => <List type='watching' {...this.props} />}
+            </Tab.Screen>
+            <Tab.Screen name='episodes' options={{ title: 'Episodes' }}>
+                {() => <List type='watching' {...this.props} />}
+            </Tab.Screen>
+            
+        </Tab.Navigator> 
     }
 }
 
@@ -332,8 +495,7 @@ const styles = StyleSheet.create({
     buttonStyleAddProfile: {
         borderColor: '#000',
         borderWidth: 1,
-        borderRadius: 20,
-        width: 360
+        borderRadius: 20
     },
     centeredView: {
         flex: 1,
@@ -355,11 +517,9 @@ const styles = StyleSheet.create({
         elevation: 5
     },
     modalViewEpisodes: {
-        height: '50%',
         backgroundColor: "rgba(255,255,255,0.9)",
         borderRadius: 20,
         padding: 12,
-        margin: 16,
         alignItems: 'center',
         shadowColor: "#000",
         shadowOffset: {
@@ -390,7 +550,7 @@ const styles = StyleSheet.create({
     }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Anime);
+export default connect(mapStateToProps, mapDispatchToProps)(Detail);
 
 /*
 {

@@ -25,6 +25,15 @@ const List = produce((
         }
     }, action) => {
         switch(action.type){
+            case ActionTypes.UPDATE_LIST_ANIME_SUCCESS:
+                if(draft[action.payload.status] !== null){
+                    var i = draft[action.payload.status].data.findIndex((val) => val.node.id === action.payload.id)
+                    if(i !== -1){
+                        draft[action.payload.status].data[i].node.my_list_status = action.payload
+                    }
+                }
+                return
+
             case ActionTypes.FETCH_USER_WATCHING_LOADING:
                 draft.isLoading.watching = true
                 return

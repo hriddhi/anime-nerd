@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, ScrollView, View, StatusBar, Linking, Text } from 'react-native';
+import { SafeAreaView, StyleSheet, ScrollView, View, StatusBar, Linking, Text, Image } from 'react-native';
 import { Button, Icon } from 'react-native-elements'
 import { connect } from 'react-redux';
 import { getToken } from '../redux/ActionCreator'
@@ -31,10 +31,9 @@ class Login extends React.Component {
 
     render() { 
         return (
-            <LinearGradient style={styles.container} colors={['#17009c','#5c007a']}>
-                <Text style={{position: 'absolute', top: '10%', left: 16, color: '#fff', fontFamily: 'RobotoCondensed-Regular', fontSize: 32}}>Welcome to</Text>
-                <Text style={{position: 'absolute', top: '15%', left: 16, color: '#fff', fontFamily: 'RobotoCondensed-Regular', fontSize: 48}}>AnimeNerd</Text>
-                
+            <View style={styles.container}>
+                <Image resizeMode='contain' source={require('./anime_character.png')} style={{width: 180, height: 180, alignSelf: 'center'}}/>
+                <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: 'rgba(255,255,255,0.9)', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>Onii-chan, you are not logged in!</Text>
                 <Button
                     title='Login with MAL'
                     type='outline'
@@ -42,8 +41,7 @@ class Login extends React.Component {
                     buttonStyle={styles.buttonStyle}
                     onPress={() => Linking.openURL('https://animenerd.herokuapp.com/auth') }
                 />
-                <Text style={{position: 'absolute', bottom: 16, color: '#fff', fontFamily: 'Roboto-Regular', fontSize: 16}}>Made with <Icon name='heart' type='font-awesome' color='#fff' size={12} /> by a nerd for a nerd</Text>
-            </LinearGradient>
+            </View>
         );
     }
 }
