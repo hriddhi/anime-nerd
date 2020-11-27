@@ -151,7 +151,6 @@ export const deleteListAnimeLoading = (id) => ({
 // ------------------------------------------------
 
 export const fetchUserAnime = (type, token) => (dispatch) => {
-    console.info(type)
     switch(type){
         case 'watching':
             dispatch(fetchWatchingLoading())

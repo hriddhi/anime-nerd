@@ -104,9 +104,9 @@ class Detail extends React.Component {
             return (  
                 
                     
-                        <ScrollView>
+                        <ScrollView nestedScrollEnabled>
                             <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.8)', marginHorizontal: 8, marginBottom: 8, borderRadius: 10}}>
-                                <Image source={{ uri: anime.main_picture.large }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 115, height: 170, flex: 1, borderBottomLeftRadius: 10, borderTopLeftRadius: 10 }}/>
+                                <Image source={{ uri: anime.main_picture.medium }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 115, height: 170, flex: 1, borderBottomLeftRadius: 10, borderTopLeftRadius: 10 }}/>
                                 <View style={{flex: 1, paddingHorizontal: 8, paddingVertical: 4}}>
                                     <Text numberOfLines={2} style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 18 }}>{anime.title}</Text>
                                     <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Medium', fontSize: 10, marginTop: -2 }}>{anime.alternative_titles.ja}</Text>
@@ -327,89 +327,85 @@ class Detail extends React.Component {
 
                             <View horizontal style={{flex: 1, height: 198, backgroundColor: 'rgba(255,255,255,0.7)', marginTop: 8, marginHorizontal: 8, borderRadius: 10}}>
                                 <Text style={{ fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingLeft: 12, padding: 8 }}>Characters</Text>
-                                <ScrollView showsHorizontalScrollIndicator={false} horizontal 
+                                <FlatList horizontal data={anime.characters} 
+                                    showsHorizontalScrollIndicator={false}
                                     style={{ left: 0, bottom: 8, position: 'absolute', marginHorizontal: -12 }}
-                                    contentContainerStyle={{ paddingHorizontal: 18 }}    
-                                >
-                                {
-                                    anime.characters.map((l,i) => (
-                                        <TouchableOpacity activeOpacity={0.9} key={i} >
+                                    contentContainerStyle={{ paddingHorizontal: 18 }}
+                                    renderItem={({ item, index }) => (
+                                        <TouchableOpacity activeOpacity={0.9} key={index} >
                                             <View style={{ marginHorizontal: 4, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
-                                                <Image source={{ uri: l.image_url }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 100, height: 150, flex: 1 }}/>
+                                                <Image source={{ uri: item.image_url }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 100, height: 150, flex: 1 }}/>
                                                 <View style={{ padding: 4, position: 'absolute', bottom: 0, backgroundColor: 'rgba(255,255,255,0.9)', width: '100%', zIndex: 1 }}>
-                                                    <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}>{(l.name.split(', ')[1] ? l.name.split(', ')[1] + ' ' : '') + l.name.split(', ')[0]}</Text>
+                                                    <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}>{(item.name.split(', ')[1] ? item.name.split(', ')[1] + ' ' : '') + item.name.split(', ')[0]}</Text>
                                                 </View>
                                             </View>
                                         </TouchableOpacity>
-                                    ))
-                                }
-                                </ScrollView>
+                                    )}
+                                    keyExtractor={(item, index) => index.toString()} 
+                                />
                             </View>
 
                             <View horizontal style={{flex: 1, height: 228, backgroundColor: 'rgba(255,255,255,0.7)', margin: 8, marginBottom: 0, borderRadius: 10}}>
                                 <Text style={{ fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingLeft: 12, padding: 8 }}>Related Anime</Text>
-                                <ScrollView showsHorizontalScrollIndicator={false} horizontal 
+                                <FlatList horizontal data={anime.related_anime} 
+                                    showsHorizontalScrollIndicator={false}
                                     style={{ left: 0, bottom: 8, position: 'absolute', marginHorizontal: -12 }}
-                                    contentContainerStyle={{ paddingHorizontal: 18 }}    
-                                >
-                                {
-                                    anime.related_anime.map((l,i) => (
-                                        <TouchableOpacity activeOpacity={0.9} key={i} onPress={()=>this.viewAnime(l.node.id)} onPressIn={()=>this.setState({ related_scroll_id: l.node.id })} onPressOut={()=>this.setState({ related_scroll_id: null })}>
-                                            <View style={{ marginHorizontal: 4, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
-                                                <Image source={{ uri: l.node.main_picture.large }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 120, height: 180, flex: 1 }}/>
-                                                <View style={{ padding: 4, position: 'absolute', bottom: 0, backgroundColor: 'rgba(255,255,255,0.9)', width: '100%', zIndex: 1 }}>
-                                                    <TextTicker
-                                                        numberOfLines={1}
-                                                        style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}
-                                                        duration={3000}
-                                                        loop
-                                                        bounce
-                                                        repeatSpacer={50}
-                                                        marqueeDelay={200}
-                                                        disabled={ this.state.related_scroll_id === l.node.id ? false : true }
-                                                    >
-                                                        {l.node.title}
-                                                    </TextTicker>
-                                                    <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Medium', fontSize: 10 }}>{l.relation_type_formatted}</Text>
-                                                </View>
+                                    contentContainerStyle={{ paddingHorizontal: 18 }}
+                                    renderItem={({ item, index }) => (
+                                    <TouchableOpacity activeOpacity={0.9} key={index} onPress={()=>this.viewAnime(item.node.id)} onPressIn={()=>this.setState({ related_scroll_id: item.node.id })} onPressOut={()=>this.setState({ related_scroll_id: null })}>
+                                        <View style={{ marginHorizontal: 4, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
+                                            <Image source={{ uri: item.node.main_picture.medium }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 120, height: 180, flex: 1 }}/>
+                                            <View style={{ padding: 4, position: 'absolute', bottom: 0, backgroundColor: 'rgba(255,255,255,0.9)', width: '100%', zIndex: 1 }}>
+                                                <TextTicker
+                                                    numberOfLines={1}
+                                                    style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}
+                                                    duration={3000}
+                                                    loop
+                                                    bounce
+                                                    repeatSpacer={50}
+                                                    marqueeDelay={200}
+                                                    disabled={ this.state.related_scroll_id === item.node.id ? false : true }
+                                                >
+                                                    {item.node.title}
+                                                </TextTicker>
+                                                <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Medium', fontSize: 10 }}>{item.relation_type_formatted}</Text>
                                             </View>
-                                        </TouchableOpacity>
-                                    ))
-                                }
-                                </ScrollView>
+                                        </View>
+                                    </TouchableOpacity>
+                                    )}
+                                    keyExtractor={(item, index) => index.toString()} 
+                                />
                             </View>
                                  
                             <View horizontal style={{flex: 1, height: 228, backgroundColor: 'rgba(255,255,255,0.7)', margin: 8, borderRadius: 10}}>
                                 <Text style={{ fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingLeft: 12, padding: 8 }}>Recommendations</Text>
-                                <ScrollView showsHorizontalScrollIndicator={false} horizontal 
+                                <FlatList horizontal data={anime.recommendations} 
+                                    showsHorizontalScrollIndicator={false}
                                     style={{ left: 0, bottom: 8, position: 'absolute', marginHorizontal: -12 }}
-                                    contentContainerStyle={{ paddingHorizontal: 18 }}    
-                                >
-                                {
-                                    anime.recommendations.map((l,i) => (
-                                        <TouchableOpacity activeOpacity={0.9} key={i} onPress={()=>this.viewAnime(l.node.id)} onPressIn={()=>this.setState({ recom_scroll_id: l.node.id })} onPressOut={()=>this.setState({ recom_scroll_id: null })}>
-                                            <View style={{ marginHorizontal: 4, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
-                                                <Image source={{ uri: l.node.main_picture.large }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 120, height: 180, flex: 1 }}/>
-                                                <View style={{ padding: 4, position: 'absolute', bottom: 0, backgroundColor: 'rgba(255,255,255,0.9)', width: '100%', zIndex: 1 }}>
-                                                    {/* <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}>{l.node.title}</Text> */}
-                                                    <TextTicker
-                                                        numberOfLines={1}
-                                                        style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}
-                                                        duration={3000}
-                                                        loop
-                                                        bounce
-                                                        repeatSpacer={50}
-                                                        marqueeDelay={200}
-                                                        disabled={ this.state.recom_scroll_id === l.node.id ? false : true }
-                                                    >
-                                                        {l.node.title}
-                                                    </TextTicker>
-                                                </View>
+                                    contentContainerStyle={{ paddingHorizontal: 18 }}
+                                    renderItem={({ item, index }) => (
+                                    <TouchableOpacity activeOpacity={0.9} key={index} onPress={()=>this.viewAnime(item.node.id)} onPressIn={()=>this.setState({ recom_scroll_id: item.node.id })} onPressOut={()=>this.setState({ recom_scroll_id: null })}>
+                                        <View style={{ marginHorizontal: 4, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
+                                            <Image source={{ uri: item.node.main_picture.medium }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 120, height: 180, flex: 1 }}/>
+                                            <View style={{ padding: 4, position: 'absolute', bottom: 0, backgroundColor: 'rgba(255,255,255,0.9)', width: '100%', zIndex: 1 }}>
+                                                <TextTicker
+                                                    numberOfLines={1}
+                                                    style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}
+                                                    duration={3000}
+                                                    loop
+                                                    bounce
+                                                    repeatSpacer={50}
+                                                    marqueeDelay={200}
+                                                    disabled={ this.state.recom_scroll_id === item.node.id ? false : true }
+                                                >
+                                                    {item.node.title}
+                                                </TextTicker>
                                             </View>
-                                        </TouchableOpacity>
-                                    ))
-                                }
-                                </ScrollView>
+                                        </View>
+                                    </TouchableOpacity>
+                                    )}
+                                    keyExtractor={(item, index) => index.toString()} 
+                                />
                             </View>
                         </ScrollView>
                     
@@ -494,7 +490,6 @@ function MyTabBar({ state, descriptors, navigation, position }) {
 class Episode extends React.Component {
 
     componentDidMount(){
-        console.log('Mounting episodes')
         this.props.fetchAnimeEpisodes(this.props.route.params.id)
     }
 
@@ -546,7 +541,6 @@ class Episode extends React.Component {
 class Anime extends React.Component {
 
     componentDidMount() {
-        console.log('Anime component mounted')
         if(this.props.anime[this.props.route.params.id] === undefined)
             this.props.fetchAnime(this.props.route.params.id, this.props.access_token)
     }
