@@ -17,8 +17,8 @@ const list = [
 class Theme extends React.Component {
   render() {
     return (
-      <View>
-        <Text>Choose Theme</Text>
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+          <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#fff', fontSize: 16, alignSelf: 'center' }}>Gomen nasai! Under Construction</Text>
       </View>
     )
   }
@@ -45,8 +45,8 @@ class Setting extends React.Component {
 
   render() {
     return (
-      <View style={{flex: 1, alignItems: 'center' }}>
-        <Icon name='cogs' size={80} type='font-awesome' color='#fff' containerStyle={{ paddingVertical: 8, backgroundColor: 'transparent' }}/>
+      <View style={{flex: 1, alignItems: 'center', paddingTop: 24 }}>
+        <Icon name='cogs' size={80} type='font-awesome' color='#fff' containerStyle={{ paddingVertical: 0, backgroundColor: 'transparent' }}/>
         <Text style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 26, color: '#fff', marginVertical: 8 }}>SETTING</Text>
 
         <View style={{ flex: 1, height: 400, width: '95%', backgroundColor: 'rgba(255,255,255,0.6)', borderRadius: 20, overflow: 'hidden' }}>

@@ -274,3 +274,27 @@ export const fetchCompletedSuccess = (data) => ({
     type: ActionTypes.FETCH_USER_COMPLETED_SUCCESS,
     payload: data
 })
+
+// ---------------------------------------------
+
+export const fetchAnimeEpisodes = (id) => (dispatch) => {
+
+    dispatch(fetchAnimeEpisodesLoading(id))
+    axios.get(`https://api.jikan.moe/v3/anime/${id}/episodes`)
+    .then((res) => {
+        dispatch(fetchAnimeEpisodesSuccess(id, res.data))
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
+}
+
+export const fetchAnimeEpisodesLoading = (id) => ({
+    type: ActionTypes.FETCH_ANIME_EPISODES_LOADING,
+    payload: id
+})
+
+export const fetchAnimeEpisodesSuccess = (id, data) => ({
+    type: ActionTypes.FETCH_ANIME_EPISODES_SUCCESS,
+    payload: { episodes: data.episodes, id }
+})

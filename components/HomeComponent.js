@@ -20,14 +20,6 @@ const mapDispatchToProps = dispatch => ({
 
 const Tab = createMaterialTopTabNavigator()
 
-function HomeScreen() {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Home!</Text>
-      </View>
-    );
-}
-
 class Home extends React.Component {
 
     componentDidMount() {

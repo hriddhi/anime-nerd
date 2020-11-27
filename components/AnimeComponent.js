@@ -1,22 +1,25 @@
-import React from 'react';
-import { StyleSheet, ScrollView, View, Text, ActivityIndicator, ImageBackground, Modal, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { StyleSheet, StatusBar, FlatList, Dimensions, ScrollView, View, Text, ActivityIndicator, ImageBackground, Modal, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { Avatar, ListItem, Image, Badge, Button, Icon, Divider } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { updateAnime, fetchAnime, deleteListAnime } from '../redux/ActionCreator'
+import { updateAnime, fetchAnime, deleteListAnime, fetchAnimeEpisodes } from '../redux/ActionCreator'
 import LinearGradient from 'react-native-linear-gradient'
 import { WheelPicker } from 'react-native-wheel-picker-android'
 import TextTicker from 'react-native-text-ticker'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+import Animated from 'react-native-reanimated';
+import Moment from 'moment'
 
 const mapStateToProps = state => ({
     anime: state.anime,
-    access_token: state.auth.access_token
+    access_token: state.auth.access_token,
 })
 
 const mapDispatchToProps = dispatch => ({
     updateAnime: (id, status, token) => dispatch(updateAnime(id, status, token)),
     fetchAnime: (type, token) => dispatch(fetchAnime(type, token)),
-    deleteListAnime: (id, status, token) => dispatch(deleteListAnime(id, status, token))
+    deleteListAnime: (id, status, token) => dispatch(deleteListAnime(id, status, token)),
+    fetchAnimeEpisodes: (id, token) => dispatch(fetchAnimeEpisodes(id, token))
 })
 
 class Detail extends React.Component {
@@ -32,10 +35,6 @@ class Detail extends React.Component {
         related_scroll_id: null,
         recom_scroll_id: null
     };
-
-    componentDidMount() {
-        this.props.fetchAnime(this.props.route.params.id, this.props.access_token)
-    }
 
     viewAnime = (id) => {
         this.props.navigation.push('Anime', { id })
@@ -81,13 +80,7 @@ class Detail extends React.Component {
 
     render() {
         
-        if(this.props.anime[this.props.route.params.id] === undefined || this.props.anime[this.props.route.params.id].isLoading){
-            return (
-                <View style={{ flex: 1, justifyContent: 'center' }}>
-                    <ActivityIndicator size='large' color='#fff'/>
-                </View>
-            )
-        } else {
+        
             const anime = this.props.anime[this.props.route.params.id].anime
 
             var info = {
@@ -109,10 +102,10 @@ class Detail extends React.Component {
             }
 
             return (  
-                <ImageBackground source={{ uri: anime.main_picture.large }} style={styles.image}>
-                    <LinearGradient style={{flex: 1}} colors={['#17009c', 'rgba(173,173,173,0.8)','#5c007a']}>
+                
+                    
                         <ScrollView>
-                            <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.7)', margin: 8, borderRadius: 10}}>
+                            <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.8)', marginHorizontal: 8, marginBottom: 8, borderRadius: 10}}>
                                 <Image source={{ uri: anime.main_picture.large }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 115, height: 170, flex: 1, borderBottomLeftRadius: 10, borderTopLeftRadius: 10 }}/>
                                 <View style={{flex: 1, paddingHorizontal: 8, paddingVertical: 4}}>
                                     <Text numberOfLines={2} style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 18 }}>{anime.title}</Text>
@@ -132,46 +125,59 @@ class Detail extends React.Component {
                                 (() => {
                                     if(this.props.anime[this.props.route.params.id].anime.my_list_status){
                                         return (
-                                            <View>
-                                                <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.7)', marginHorizontal: 8, marginBottom: 8, borderRadius: 36 }}>
-                                                    <View style={{margin: 8, flex: 1, flexGrow: 2}}>
-                                                        <Button title={ this.getStatus() } 
-                                                            type='outline' 
-                                                            titleStyle={styles.buttonText} 
-                                                            buttonStyle={styles.buttonStyle} 
-                                                            onPress={this.setmodal_status}
-                                                            icon={ <Icon name="angle-down"  type='font-awesome' size={18} color="black" style={{ paddingLeft: 8 }}  /> } 
-                                                            iconRight={true}
-                                                            loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.status ? true : false} 
-                                                            loadingProps={{color: '#000'}}
-                                                        />
+                                            <React.Fragment>
+                                                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1, flexDirection: 'row' }}>
+                                                    <View style={{flex: 1, overflow: 'hidden', flexDirection: 'row', width: Math.round(Dimensions.get('window').width) - 24,  backgroundColor: 'rgba(255,255,255,0.8)', marginHorizontal: 8, marginBottom: 8, borderRadius: 36 }}>
+                                                        <View style={{flex: 1, flexGrow: 2}}>
+                                                            <Button title={ this.getStatus() } 
+                                                                type='outline' 
+                                                                titleStyle={styles.buttonText} 
+                                                                buttonStyle={{ height: '100%', borderWidth: 0 }} 
+                                                                onPress={this.setmodal_status}
+                                                                icon={ <Icon name="angle-down" type='font-awesome' size={18} color="black" style={{ paddingLeft: 8 }}  /> } 
+                                                                iconRight={true}
+                                                                loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.status ? true : false} 
+                                                                loadingProps={{color: '#000'}}
+                                                            />
+                                                        </View>
+                                                        <View style={{ flex: 1}}>
+                                                            <Button 
+                                                                title={anime.my_list_status.num_episodes_watched === 0 ? '-' : `${anime.my_list_status.num_episodes_watched}`} 
+                                                                type='outline' 
+                                                                titleStyle={styles.buttonText} 
+                                                                buttonStyle={{ height: '100%', borderRadius: 0, borderTopWidth: 0, borderBottomWidth: 0, borderColor: 'grey' }}
+                                                                onPress={this.setmodal_episode}
+                                                                icon={ <Icon name="eye" type='font-awesome' size={18} color="black" style={{ paddingLeft: 10 }} /> } 
+                                                                iconRight={true}
+                                                                loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.episode !== null ? true : false} 
+                                                                loadingProps={{color: '#000'}}
+                                                            />
+                                                        </View>
+                                                        <View style={{flex: 1}}>
+                                                            <Button title={anime.my_list_status.score === 0 ? '-' : `${anime.my_list_status.score}`} 
+                                                                type='outline' 
+                                                                titleStyle={styles.buttonText} 
+                                                                buttonStyle={{ height: '100%', borderWidth: 0 }}
+                                                                icon={ <Icon name="thumbs-up" type='font-awesome' size={18} color="black" style={{ paddingLeft: 10 }} /> } 
+                                                                iconRight={true}
+                                                                loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.rating !== null ? true : false} 
+                                                                loadingProps={{color: '#000'}}
+                                                                onPress={this.setmodal_rating}
+                                                            />
+                                                        </View>
                                                     </View>
-                                                    <View style={{marginVertical: 8, marginRight: 8, flex: 1}}>
-                                                        <Button 
-                                                            title={anime.my_list_status.num_episodes_watched === 0 ? '-' : `${anime.my_list_status.num_episodes_watched}`} 
+                                                    <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 36, marginBottom: 8, marginRight: 8, overflow: 'hidden' }}>
+                                                        <Button icon={<Icon name="trash" type='font-awesome' size={18} color="black"/>} 
                                                             type='outline' 
-                                                            titleStyle={styles.buttonText} 
-                                                            buttonStyle={styles.buttonStyleSeen}
-                                                            onPress={this.setmodal_episode}
-                                                            icon={ <Icon name="eye" type='font-awesome' size={18} color="black" style={{ paddingLeft: 10 }} /> } 
-                                                            iconRight={true}
-                                                            loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.episode !== null ? true : false} 
+                                                            titleStyle={styles.buttonText}
+                                                            buttonStyle={{ height: '100%', borderWidth: 0, width: 40  }}
+                                                            loading={this.props.anime[this.props.route.params.id].isDeleting ? true : false} 
                                                             loadingProps={{color: '#000'}}
+                                                            onPress={()=>this.props.deleteListAnime(this.props.anime[this.props.route.params.id].id, this.props.anime[this.props.route.params.id].anime.my_list_status.status, this.props.access_token)} 
                                                         />
+                                                        
                                                     </View>
-                                                    <View style={{marginVertical: 8, marginRight: 8, flex: 1}}>
-                                                        <Button title={anime.my_list_status.score === 0 ? '-' : `${anime.my_list_status.score}`} 
-                                                            type='outline' 
-                                                            titleStyle={styles.buttonText} 
-                                                            buttonStyle={styles.buttonStyleRating}
-                                                            icon={ <Icon name="thumbs-up" type='font-awesome' size={18} color="black" style={{ paddingLeft: 10 }} /> } 
-                                                            iconRight={true}
-                                                            loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.rating !== null ? true : false} 
-                                                            loadingProps={{color: '#000'}}
-                                                            onPress={this.setmodal_rating}
-                                                        />
-                                                    </View>
-                                                </View>
+                                                </ScrollView>
                                                 <Modal animationType="fade" transparent={true} visible={this.state.modal_status} onRequestClose={this.setmodal_status}>
                                                     <TouchableOpacity style={styles.centeredView} activeOpacity={1} onPressOut={this.setmodal_status}>
                                                     <TouchableWithoutFeedback>
@@ -267,16 +273,16 @@ class Detail extends React.Component {
                                                         </TouchableWithoutFeedback>
                                                     </TouchableOpacity>
                                                 </Modal>
-                                            </View>
+                                            </React.Fragment>
                                         )
                                     } else {
                                         return (
-                                            <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.6)', marginHorizontal: 8, marginBottom: 8, borderRadius: 36 }}>
-                                                <View style={{margin: 8, flex: 1, flexGrow: 2}}>
+                                            <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.7)', marginHorizontal: 8, marginBottom: 8, borderRadius: 36 }}>
+                                                <View style={{flex: 1, flexGrow: 2}}>
                                                     <Button title='Add to Profile' 
                                                         type='outline' 
                                                         titleStyle={styles.buttonText} 
-                                                        buttonStyle={styles.buttonStyleAddProfile} 
+                                                        buttonStyle={{ height: '100%', borderWidth: 0 }} 
                                                         icon={ <Icon name="plus"  type='font-awesome' size={18} color="black" style={{ paddingRight: 16 }}  /> } 
                                                         loading={this.props.anime[this.props.route.params.id].isUpdating.id === this.props.anime[this.props.route.params.id].id && this.props.anime[this.props.route.params.id].isUpdating.status ? true : false} 
                                                         loadingProps={{color: '#000'}}
@@ -331,7 +337,7 @@ class Detail extends React.Component {
                                             <View style={{ marginHorizontal: 4, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
                                                 <Image source={{ uri: l.image_url }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 100, height: 150, flex: 1 }}/>
                                                 <View style={{ padding: 4, position: 'absolute', bottom: 0, backgroundColor: 'rgba(255,255,255,0.9)', width: '100%', zIndex: 1 }}>
-                                                    <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}>{l.name.split(', ')[1] + ' ' + l.name.split(', ')[0]}</Text>
+                                                    <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 12 }}>{(l.name.split(', ')[1] ? l.name.split(', ')[1] + ' ' : '') + l.name.split(', ')[0]}</Text>
                                                 </View>
                                             </View>
                                         </TouchableOpacity>
@@ -405,56 +411,187 @@ class Detail extends React.Component {
                                 }
                                 </ScrollView>
                             </View>
-
-                            {
-                                (() => {
-                                    if(this.props.anime[this.props.route.params.id].anime.my_list_status)
-                                        return (
-                                            <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.7)', marginHorizontal: 8, marginBottom: 8, borderRadius: 36 }}>
-                                                <View style={{margin: 8, flex: 1, flexGrow: 1}}>
-                                                    <Button title='Delete from Profile' 
-                                                        type='outline' 
-                                                        titleStyle={styles.buttonText} 
-                                                        buttonStyle={styles.buttonStyleAddProfile} 
-                                                        icon={ <Icon name="trash" type='font-awesome' size={18} color="black" style={{ paddingRight: 16 }}  /> } 
-                                                        loading={this.props.anime[this.props.route.params.id].isDeleting ? true : false} 
-                                                        loadingProps={{color: '#000'}}
-                                                        onPress={()=>this.props.deleteListAnime(this.props.anime[this.props.route.params.id].id, this.props.anime[this.props.route.params.id].anime.my_list_status.status, this.props.access_token)} 
-                                                    />
-                                                </View>
-                                            </View>
-                                        )
-                                })()
-                            }
-                            
                         </ScrollView>
-                    </LinearGradient>
-                </ImageBackground>
+                    
+                
             );
         }
-    }
+    
 }
 
 const Tab = createMaterialTopTabNavigator()
 
-class Anime extends React.Component {
+function MyTabBar({ state, descriptors, navigation, position }) {
 
-    render() {
-        <Tab.Navigator backBehavior="none" lazy 
-            sceneContainerStyle={{backgroundColor: 'transparent'}} 
-            style={{ backgroundColor: 'transparent' }} 
-            tabBarOptions={{ indicatorStyle: { borderBottomWidth: 5, borderColor: '#fff' }, scrollEnabled: true, labelStyle: { color: '#fff', fontFamily: 'SpaceGrotesk-SemiBold' }, style: { backgroundColor: 'transparent' } }} 
-        >
-            <Tab.Screen name='details' options={{ title: 'Details' }}>
-                {() => <List type='watching' {...this.props} />}
-            </Tab.Screen>
-            <Tab.Screen name='episodes' options={{ title: 'Episodes' }}>
-                {() => <List type='watching' {...this.props} />}
-            </Tab.Screen>
-            
-        </Tab.Navigator> 
+    const scrollViewRef = useRef(null)
+
+    useEffect(() => {
+        scrollViewRef.current.scrollTo({ x: state.index * 50, y: 0, animated: true })
+    }, [state.index])
+
+    return (
+    <View style={{ margin: 8 }}>
+    <ScrollView ref={list => scrollViewRef.current = list} horizontal showsHorizontalScrollIndicator={false}>
+      <View style={{ flexDirection: 'row' }}>
+        {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          const label =
+            options.tabBarLabel !== undefined
+              ? options.tabBarLabel
+              : options.title !== undefined
+              ? options.title
+              : route.name;
+  
+          const isFocused = state.index === index;
+  
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
+  
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
+  
+          const onLongPress = () => {
+            navigation.emit({
+              type: 'tabLongPress',
+              target: route.key,
+            });
+          };
+  
+          const inputRange = state.routes.map((_, i) => i);
+          const opacity = Animated.interpolate(position, {
+            inputRange,
+            outputRange: inputRange.map(i => (i === index ? 1 : 0.5)),
+          });
+
+          return (
+            <TouchableOpacity
+                key={index}
+                testID={options.tabBarTestID}
+                onPress={onPress}
+                onLongPress={onLongPress}
+                style={{ flex: 1 }}
+            >
+                <Animated.View style={{ opacity, marginRight: 8, paddingHorizontal: 12, paddingVertical: 2, backgroundColor: `rgba(255,255,255,0.8)`, borderRadius: 20 }}>
+                    <Animated.Text style={{ color: '#000', fontFamily: 'SpaceGrotesk-Medium', fontSize: 12 }} >
+                        {label}
+                    </Animated.Text>
+                </Animated.View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+      </ScrollView>
+      </View>
+    );
+}
+
+class Episode extends React.Component {
+
+    componentDidMount(){
+        console.log('Mounting episodes')
+        this.props.fetchAnimeEpisodes(this.props.route.params.id)
+    }
+
+    render(){
+        
+            Moment.locale('en')
+            return (
+                <FlatList data={this.props.anime[this.props.route.params.id].episodes} 
+                    renderItem={({ item, index }) => (
+                    <TouchableOpacity key={index} activeOpacity={0.7}>
+                    <ListItem key={index} containerStyle={{height: 80, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.8)', overflow: 'hidden' }}>
+                        <View style={{ backgroundColor: 'rgba(0,0,0,0.3)', width: 60, height: '100%', display: 'flex', justifyContent: "center", alignItems: "center" }}>
+                            <Text style={{ fontSize: 22, fontFamily: 'SpaceGrotesk-SemiBold' }}>{item.episode_id}</Text>
+                        </View>
+                        <View style={{ height: '100%', paddingRight: 16, paddingVertical: 8, flex: 1 }}>
+                            <Text numberOfLines={1} style={{ flexShrink: 1, fontSize: 16, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%'}}>{item.title}</Text>
+                            <Text style={{ flexShrink: 1, fontSize: 12, fontFamily: 'SpaceGrotesk-Medium', width: '100%'}}>{item.title_japanese}</Text>
+                            <Text style={{ marginTop: 8, flexShrink: 1, fontSize: 12, fontFamily: 'SpaceGrotesk-Medium', width: '100%'}}>{ 'Aired On: ' + (item.aired ? Moment(item.aired).format('LLL') : 'Not Available') }</Text>
+                        </View>
+                    </ListItem>
+                    </TouchableOpacity>
+                    )}
+                    keyExtractor={(item, index) => index.toString()} 
+                    ListEmptyComponent={
+                        (() => {
+                            if(this.props.anime[this.props.route.params.id].loadingEpisodes){
+                                return (
+                                    <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center', height: Math.round(Dimensions.get('window').height) - 150  }}>
+                                        
+                                        <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: 'rgba(255,255,255,0.9)', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>*Nyan* Loading Episodes</Text>
+                                        <ActivityIndicator size='large' color='#fff' />
+                                    </View>
+                                )
+                            } else {
+                                return (
+                                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                        <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: 'rgba(255,255,255,0.9)', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>*Nyan* Your list is empty</Text>
+                                    </View>
+                                )
+                            }
+                        })()
+                    }
+                />
+            )
+        
     }
 }
+
+class Anime extends React.Component {
+
+    componentDidMount() {
+        console.log('Anime component mounted')
+        if(this.props.anime[this.props.route.params.id] === undefined)
+            this.props.fetchAnime(this.props.route.params.id, this.props.access_token)
+    }
+
+    render() {
+        if(this.props.anime[this.props.route.params.id] === undefined || this.props.anime[this.props.route.params.id].isLoading){
+            return (
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <ActivityIndicator size='large' color='#fff'/>
+                </View>
+            )
+        } else {
+            return (
+                <ImageBackground source={{ uri: this.props.anime[this.props.route.params.id] && this.props.anime[this.props.route.params.id].anime !== null ? this.props.anime[this.props.route.params.id].anime.main_picture.large : null }} style={styles.image}>
+                    <LinearGradient style={{flex: 1}} colors={['rgba(0,0,0,0.1)', '#17009ca0', 'rgba(173,173,173,0.8)','#5c007a']}>
+                        <Tab.Navigator backBehavior="none" lazy tabBar={props => <MyTabBar {...props} />} style={{ marginTop: 50 + StatusBar.currentHeight }}>
+                            <Tab.Screen name='details' options={{ title: 'DETAILS' }}>
+                                {() => <Detail {...this.props} />}
+                            </Tab.Screen>
+                            <Tab.Screen name='episodes' options={{ title: 'EPISODES' }}>
+                                {() => <Episode {...this.props} />}
+                            </Tab.Screen>
+                            <Tab.Screen name='reviews' options={{ title: 'REVIEWS' }}>
+                                {() => (
+                                    <View style={{ flex: 1, justifyContent: 'center' }}>
+                                        <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#fff', fontSize: 16, alignSelf: 'center' }}>Gomen nasai! Under Construction</Text>
+                                    </View>
+                                )}
+                            </Tab.Screen>
+                            <Tab.Screen name='stats' options={{ title: 'STATS' }}>
+                                {() => (
+                                    <View style={{ flex: 1, justifyContent: 'center' }}>
+                                        <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#fff', fontSize: 16, alignSelf: 'center' }}>Gomen nasai! Under Construction</Text>
+                                    </View>
+                                )}
+                            </Tab.Screen>
+                        </Tab.Navigator> 
+                    </LinearGradient>
+                </ImageBackground>
+            )
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Anime);
 
 const styles = StyleSheet.create({
     container: {
@@ -550,7 +687,7 @@ const styles = StyleSheet.create({
     }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Detail);
+
 
 /*
 {

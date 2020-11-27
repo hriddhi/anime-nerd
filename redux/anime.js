@@ -1,6 +1,5 @@
 import * as ActionTypes from './ActionTypes';
 import produce from 'immer';
-import { TabRouter } from '@react-navigation/native';
 
 const Anime = produce((
     draft = {
@@ -18,15 +17,15 @@ const Anime = produce((
                         rating: null
                     },
                     isDeleting: null,
-                    anime: null
+                    anime: null,
+                    loadingEpisodes: false,
+                    episodes: []
                 }
-                
                 return
 
             case ActionTypes.FETCH_ANIME_SUCCESS:
                 draft[action.payload.id].isLoading = false
                 draft[action.payload.id].anime = action.payload
-                
                 return
 
             case ActionTypes.UPDATE_ANIME_STATUS_LOADING:
@@ -45,6 +44,15 @@ const Anime = produce((
 
             case ActionTypes.DELETE_LIST_ANIME_LOADING:
                 draft[action.payload].isDeleting = true
+                return
+
+            case ActionTypes.FETCH_ANIME_EPISODES_LOADING:
+                draft[action.payload].loadingEpisodes = true
+                return
+
+            case ActionTypes.FETCH_ANIME_EPISODES_SUCCESS:
+                draft[action.payload.id].loadingEpisodes = false
+                draft[action.payload.id].episodes = action.payload.episodes
                 return
 
             default:
