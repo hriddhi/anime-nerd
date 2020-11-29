@@ -45,6 +45,7 @@ class Setting extends React.Component {
 
   render() {
     return (
+      <LinearGradient style={{flex: 1}} colors={['rgba(0,0,0,0.1)', '#17009ca0','#5c007a']}>
       <View style={{flex: 1, alignItems: 'center', paddingTop: 24 }}>
         <Icon name='cogs' size={80} type='font-awesome' color='#fff' containerStyle={{ paddingVertical: 0, backgroundColor: 'transparent' }}/>
         <Text style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 26, color: '#fff', marginVertical: 8 }}>SETTING</Text>
@@ -57,6 +58,7 @@ class Setting extends React.Component {
         
         </View>
       </View>
+      </LinearGradient>
     )
   }
 }

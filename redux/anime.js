@@ -18,10 +18,8 @@ const Anime = produce((
                     },
                     isDeleting: null,
                     anime: null,
-                    loadingEpisodes: false,
                     loadingSongs: false,
                     songErr: false,
-                    episodes: [],
                     songs:[]
                 }
                 return
@@ -47,15 +45,6 @@ const Anime = produce((
 
             case ActionTypes.DELETE_LIST_ANIME_LOADING:
                 draft[action.payload].isDeleting = true
-                return
-
-            case ActionTypes.FETCH_ANIME_EPISODES_LOADING:
-                draft[action.payload].loadingEpisodes = true
-                return
-
-            case ActionTypes.FETCH_ANIME_EPISODES_SUCCESS:
-                draft[action.payload.id].loadingEpisodes = false
-                draft[action.payload.id].episodes = action.payload.episodes
                 return
 
             case ActionTypes.FETCH_ANIME_SONGS_LOADING:

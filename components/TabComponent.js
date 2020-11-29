@@ -8,9 +8,12 @@ import Anime from './AnimeComponent'
 import Setting from './SettingComponent'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { enableScreens } from 'react-native-screens'
+import { createNativeStackNavigator } from 'react-native-screens/native-stack'
 import LinearGradient from 'react-native-linear-gradient'
 
-const Stack = createStackNavigator();
+enableScreens()
+const Stack = createNativeStackNavigator();
 
 import { connect } from 'react-redux';
 import { updateSearch, updateSearchSuccess } from '../redux/ActionCreator';
@@ -30,32 +33,17 @@ const mapDispatchToProps = (dispatch) => ({
 
 class Tab extends React.Component {
 
-  state = {
-    search: ''
-  }
-
-  timer = null;
-
-  updateSearch = (search) => {
-    this.setState({search})
-    if(search.length === 0){
-      this.props.updateSearchSuccess([])
-    } else if(search.length > 2){
-      clearTimeout(this.timer);
-      this.timer = setTimeout(() => {
-        this.props.updateSearch(search, this.props.access_token)
-      }, 250);
-    }
-  }
+  
 
 
   render() {
     return (
       <LinearGradient style={{flex: 1}} colors={['#17009c','#5c007a']}>
+        
           <Stack.Navigator>
-            <Stack.Screen name="Home" component={Home} options={{ headerTitle: 'HOME', headerTitleStyle: { color: '#fff', fontFamily: 'SpaceGrotesk-Bold' } }}/>
-            <Stack.Screen name="Search" component={Search} options={{ headerStyle: { backgroundColor: 'rgba(255,255,255,0.7)' }, headerRight: null, headerLeft: null, headerTitle: () => <SearchBar ref={search => this.searchRef = search} round={true} onChangeText={this.updateSearch} value={this.state.search} placeholder='Search Anime' inputStyle={{ fontFamily: 'SpaceGrotesk-Medium' }} platform='android' leftIcon={{ color: '#fff' }} containerStyle={{ backgroundColor: 'transparent' }} showLoading={this.props.search.isLoading} loadingProps={{color: '#000'}} /> }} />
-            <Stack.Screen name="Anime" component={Anime} options={{ headerTransparent: true, headerTitle: 'ANIME', headerTintColor: '#fff', headerTitleStyle: { color: '#fff', fontFamily: 'SpaceGrotesk-Bold' } }} />
+            <Stack.Screen name="Home" component={Home} options={{ headerShown: false, stackAnimation: 'none' }}/>
+            <Stack.Screen name="Search" component={Search} options={{ headerShown: false, stackAnimation: 'fade' }} />
+            <Stack.Screen name="Anime" component={Anime} options={{ headerShown: false, stackAnimation: 'fade' }} />
           </Stack.Navigator>
       </LinearGradient>
     );

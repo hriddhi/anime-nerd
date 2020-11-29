@@ -6,33 +6,23 @@ import Setting from './SettingComponent'
 import Tab from './TabComponent'
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
-import LinearGradient from 'react-native-linear-gradient'
-import { connect } from 'react-redux';
-import { updateSearch } from '../redux/ActionCreator';
-
-const mapStateToProps = state => {
-    return {
-        search: state.search,
-        access_token: state.auth.access_token,
-        list: state.list
-    }
-}
-
-const mapDispatchToProps = (dispatch) => ({
-    updateSearch: (str, token) => dispatch(updateSearch(str, token))
-})
+import SplashScreen from 'react-native-splash-screen'
 
 const BottomTab = createMaterialBottomTabNavigator();
 
 class Main extends React.Component {
 
+  componentDidMount(){
+    SplashScreen.hide();
+  }
+
   render() {
     return (
-      <LinearGradient style={{flex: 1}} colors={['#17009c','#5c007a']}>
-        <StatusBar translucent backgroundColor='transparent' />
+     
+      
+        
         <NavigationContainer theme={{ colors: { background: 'rgba(0,0,0,0)', labelStyle: { color: '#fff', fontFamily: 'SpaceGrotesk-SemiBold' } } }}>
-          <BottomTab.Navigator activeColor='#fff' inactiveColor='grey' barStyle={{ backgroundColor: 'rgba(0,0,0,0.0)' }}>
+          <BottomTab.Navigator activeColor='#fff' inactiveColor='grey' barStyle={{ backgroundColor: '#5c007a' }}>
             <BottomTab.Screen name="Home" 
               component={Tab}
               options={{ 
@@ -49,9 +39,10 @@ class Main extends React.Component {
             />
           </BottomTab.Navigator>
         </NavigationContainer>
-      </LinearGradient>
+      
+   
     );
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Main);
+export default Main;

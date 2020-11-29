@@ -38,19 +38,13 @@ export const fetchAnime = (id, token) => (dispatch) => {
 
     dispatch(fetchAnimeLoading(id))
 
-    axios.get(`https://api.myanimelist.net/v2/anime/${id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics`, {
+    axios.get(`https://api.myanimelist.net/v2/anime/${id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,nsfw,media_type,status,genres,my_list_status,num_episodes,start_season,source,average_episode_duration,rating,related_anime,studios`, {
         headers: {
             'Authorization': 'Bearer ' + token
         }
     })
     .then((res) => {
-        axios.get(`https://api.jikan.moe/v3/anime/${id}/characters_staff`)
-        .then((res1) => {
-            dispatch(fetchAnimeSuccess({ ...res.data, ...res1.data }))
-        })
-        .catch((err) => {
-            console.error(err.message)
-        })
+        dispatch(fetchAnimeSuccess(res.data))
     })
     .catch((err) => {
         console.error(err.message)
@@ -274,30 +268,6 @@ export const fetchCompletedSuccess = (data) => ({
     payload: data
 })
 
-// ---------------------------------------------
-
-export const fetchAnimeEpisodes = (id) => (dispatch) => {
-
-    dispatch(fetchAnimeEpisodesLoading(id))
-    axios.get(`https://api.jikan.moe/v3/anime/${id}/episodes`)
-    .then((res) => {
-        dispatch(fetchAnimeEpisodesSuccess(id, res.data))
-    })
-    .catch((err) => {
-        console.error(err.message)
-    })
-}
-
-export const fetchAnimeEpisodesLoading = (id) => ({
-    type: ActionTypes.FETCH_ANIME_EPISODES_LOADING,
-    payload: id
-})
-
-export const fetchAnimeEpisodesSuccess = (id, data) => ({
-    type: ActionTypes.FETCH_ANIME_EPISODES_SUCCESS,
-    payload: { episodes: data.episodes, id }
-})
-
 // -------------------------------------------
 
 export const fetchAnimeSongs = (id, name) => (dispatch) => {
@@ -324,4 +294,78 @@ export const fetchAnimeSongsLoading = (id) => ({
 export const fetchAnimeSongsSuccess = (id, data) => ({
     type: ActionTypes.FETCH_ANIME_SONGS_SUCCESS,
     payload: { songs: data.data, id: id }
+})
+
+// ================== NEW SECTION ====================
+
+export const fetchAnimeCharacter = (id) => (dispatch) => {
+    dispatch(fetchAnimeCharacterLoading(id))
+
+    axios.get(`https://api.jikan.moe/v3/anime/${id}/characters_staff`)
+    .then((res) => {
+        dispatch(fetchAnimeCharacterSuccess(id, res.data))
+        //console.log(res.data)
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
+}
+
+export const fetchAnimeCharacterLoading = (id) => ({
+    type: ActionTypes.FETCH_ANIME_CHARACTER_LOADING,
+    payload: id
+})
+
+export const fetchAnimeCharacterSuccess = (id, character) => ({
+    type: ActionTypes.FETCH_ANIME_CHARACTER_SUCCESS,
+    payload: { id, character }
+})
+
+// -----
+
+export const fetchAnimeRecommendation = (id) => (dispatch) => {
+    dispatch(fetchAnimeRecommendationLoading(id))
+
+    axios.get(`https://api.jikan.moe/v3/anime/${id}/recommendations`)
+    .then((res) => {
+        dispatch(fetchAnimeRecommendationSuccess(id, res.data))
+        //console.log(res.data)
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
+}
+
+export const fetchAnimeRecommendationLoading = (id) => ({
+    type: ActionTypes.FETCH_ANIME_RECOMMEND_LOADING,
+    payload: id
+})
+
+export const fetchAnimeRecommendationSuccess = (id, recommendation) => ({
+    type: ActionTypes.FETCH_ANIME_RECOMMEND_SUCCESS,
+    payload: { id, recommendation }
+})
+
+// ------------------
+
+export const fetchAnimeEpisodes = (id) => (dispatch) => {
+
+    dispatch(fetchAnimeEpisodesLoading(id))
+    axios.get(`https://api.jikan.moe/v3/anime/${id}/episodes`)
+    .then((res) => {
+        dispatch(fetchAnimeEpisodesSuccess(id, res.data))
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
+}
+
+export const fetchAnimeEpisodesLoading = (id) => ({
+    type: ActionTypes.FETCH_ANIME_EPISODES_LOADING,
+    payload: id
+})
+
+export const fetchAnimeEpisodesSuccess = (id, data) => ({
+    type: ActionTypes.FETCH_ANIME_EPISODES_SUCCESS,
+    payload: { episodes: data.episodes, id }
 })

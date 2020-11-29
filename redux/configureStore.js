@@ -5,6 +5,9 @@ import logger from 'redux-logger'
 import Search from './search'
 import Auth from './auth'
 import Anime from './anime'
+import Character from './character'
+import Recommendation from './recommendation'
+import Episode from './episode'
 import List from './list'
 import { persistStore, persistReducer } from 'redux-persist'
 
@@ -21,7 +24,10 @@ const store = createStore(
             search: Search,
             auth: Auth,
             anime: Anime,
-            list: List
+            list: List,
+            character: Character,
+            recommendation: Recommendation,
+            episode: Episode
         })
     ),
     applyMiddleware(thunk)
