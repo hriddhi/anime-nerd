@@ -19,7 +19,10 @@ const Anime = produce((
                     isDeleting: null,
                     anime: null,
                     loadingEpisodes: false,
-                    episodes: []
+                    loadingSongs: false,
+                    songErr: false,
+                    episodes: [],
+                    songs:[]
                 }
                 return
 
@@ -53,6 +56,21 @@ const Anime = produce((
             case ActionTypes.FETCH_ANIME_EPISODES_SUCCESS:
                 draft[action.payload.id].loadingEpisodes = false
                 draft[action.payload.id].episodes = action.payload.episodes
+                return
+
+            case ActionTypes.FETCH_ANIME_SONGS_LOADING:
+                draft[action.payload].loadingSongs = true
+                draft[action.payload].songErr = false
+                return
+
+            case ActionTypes.FETCH_ANIME_SONGS_ERROR:
+                draft[action.payload].songErr = true
+                return
+
+            case ActionTypes.FETCH_ANIME_SONGS_SUCCESS:
+                draft[action.payload.id].loadingSongs = false
+                draft[action.payload.id].songErr = false
+                draft[action.payload.id].songs = action.payload.songs
                 return
 
             default:

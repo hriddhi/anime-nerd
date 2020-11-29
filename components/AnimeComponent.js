@@ -1,8 +1,8 @@
 import React, { useRef, useEffect } from 'react';
-import { StyleSheet, StatusBar, FlatList, Dimensions, ScrollView, View, Text, ActivityIndicator, ImageBackground, Modal, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, StatusBar, FlatList, Dimensions, ScrollView, View, Text, ActivityIndicator, ImageBackground, Modal, TouchableOpacity, TouchableWithoutFeedback, Linking } from 'react-native';
 import { Avatar, ListItem, Image, Badge, Button, Icon, Divider } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { updateAnime, fetchAnime, deleteListAnime, fetchAnimeEpisodes } from '../redux/ActionCreator'
+import { updateAnime, fetchAnime, deleteListAnime, fetchAnimeSongs, fetchAnimeEpisodes } from '../redux/ActionCreator'
 import LinearGradient from 'react-native-linear-gradient'
 import { WheelPicker } from 'react-native-wheel-picker-android'
 import TextTicker from 'react-native-text-ticker'
@@ -19,7 +19,8 @@ const mapDispatchToProps = dispatch => ({
     updateAnime: (id, status, token) => dispatch(updateAnime(id, status, token)),
     fetchAnime: (type, token) => dispatch(fetchAnime(type, token)),
     deleteListAnime: (id, status, token) => dispatch(deleteListAnime(id, status, token)),
-    fetchAnimeEpisodes: (id, token) => dispatch(fetchAnimeEpisodes(id, token))
+    fetchAnimeEpisodes: (id, token) => dispatch(fetchAnimeEpisodes(id, token)),
+    fetchAnimeSongs: (id,name) => dispatch(fetchAnimeSongs(id, name))
 })
 
 class Detail extends React.Component {
@@ -501,8 +502,8 @@ class Episode extends React.Component {
                     renderItem={({ item, index }) => (
                     <TouchableOpacity key={index} activeOpacity={0.7}>
                     <ListItem key={index} containerStyle={{height: 80, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.8)', overflow: 'hidden' }}>
-                        <View style={{ backgroundColor: 'rgba(0,0,0,0.3)', width: 60, height: '100%', display: 'flex', justifyContent: "center", alignItems: "center" }}>
-                            <Text style={{ fontSize: 22, fontFamily: 'SpaceGrotesk-SemiBold' }}>{item.episode_id}</Text>
+                        <View style={{ backgroundColor: 'rgba(0,0,0,0.3)', width: 70, height: '100%', display: 'flex', justifyContent: "center", alignItems: "center" }}>
+                            <Text style={{ fontSize: 22, fontFamily: 'SpaceGrotesk-SemiBold' }}>#{item.episode_id}</Text>
                         </View>
                         <View style={{ height: '100%', paddingRight: 16, paddingVertical: 8, flex: 1 }}>
                             <Text numberOfLines={1} style={{ flexShrink: 1, fontSize: 16, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%'}}>{item.title}</Text>
@@ -538,6 +539,78 @@ class Episode extends React.Component {
     }
 }
 
+class Songs extends React.Component {
+
+    componentDidMount(){
+        this.props.fetchAnimeSongs(this.props.route.params.id, this.props.anime[this.props.route.params.id].anime.title)
+    }
+
+    render(){
+        return (
+            <React.Fragment>
+            <View style={{ flexDirection: 'row', paddingVertical: 4, paddingRight: 8, height: 48, backgroundColor: 'rgba(255,255,255,0.7)', marginHorizontal: 8, marginBottom: 4, borderRadius: 10 }}>
+                <Icon name="exclamation-triangle" type='font-awesome' size={28} color="#b0a100" style={{ padding: 8 }} />
+                <Text style={{ flex: 1, fontSize: 14, fontFamily: 'SpaceGrotesk-Medium' }}>Sometimes, songs might not work as intended. Gomen nasai!</Text>
+            </View>
+            <View style={{ flexDirection: 'row', paddingVertical: 4, paddingRight: 8, height: 48, backgroundColor: 'rgba(255,255,255,0.7)', marginHorizontal: 8, marginBottom: 4, borderRadius: 10 }}>
+                <Icon name="spotify" type='font-awesome' size={32} color="#028200" style={{ paddingHorizontal: 8, paddingTop: 4 }} />
+                <Text style={{ flex: 1, fontSize: 14, fontFamily: 'SpaceGrotesk-Medium' }}>All song will open directly on Spotify. Songs available only on Spotify is shown</Text>
+            </View>
+            <FlatList data={this.props.anime[this.props.route.params.id].songs} 
+                renderItem={({ item, index }) => (
+                    <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} style={{flex: 1, borderRadius: 10, marginVertical: 3, marginHorizontal: 8}} colors={['rgba(255,255,255,0.8)', '#009129']}>
+                        
+                        <ListItem key={index} containerStyle={{height: 70, padding: 0, backgroundColor: 'rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+                            <View style={{ backgroundColor: 'rgba(255,255,255,0)', width: 70, height: '100%', display: 'flex', justifyContent: "center", alignItems: "center" }}>
+                                <Text style={{ fontSize: 22, fontFamily: 'SpaceGrotesk-SemiBold' }}>#{index + 1}</Text>
+                            </View>
+                            <View style={{ height: '100%', paddingRight: 16, paddingVertical: 8, flex: 1 }}>
+                                <Text numberOfLines={1} style={{ flexShrink: 1,  fontSize: 16, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%'}}>{item.name}</Text>
+                                <View style={{ flex: 1, flexDirection: 'row', marginTop: 8 }}>
+                                    <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 50}}>{item.tag.toUpperCase()}</Text>
+                                    <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 50}}>{item.link.substring(item.link.indexOf('/',10) + 1, item.link.lastIndexOf('/')).toUpperCase()}</Text>
+                                </View>
+                            </View> 
+                            <TouchableOpacity key={index} activeOpacity={0.4} onPress={() => Linking.openURL(item.link)}>
+                                <View style={{ borderRadius: 20, borderWidth: 4, backgroundColor: 'rgba(0,0,0,0.3)', borderColor: 'rgba(0,0,0,0.8)', height: 40, width: 40, justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                                    <Icon name="play" type='font-awesome' size={18} color="rgba(0,171,122,0.8)" style={{ marginLeft: 2 }} />
+                                </View>
+                            </TouchableOpacity>
+                        </ListItem>
+                    </LinearGradient>
+                )}
+                keyExtractor={(item, index) => index.toString()} 
+                ListEmptyComponent={
+                    (() => {
+                        if(this.props.anime[this.props.route.params.id].loadingSongs){
+                            return (
+                                <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center', height: Math.round(Dimensions.get('window').height) - 150  }}>
+                                    <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: 'rgba(255,255,255,0.9)', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>*Nyan* Loading Songs</Text>
+                                    <ActivityIndicator size='large' color='#fff' />
+                                </View>
+                            )
+                        } else if(this.props.anime[this.props.route.params.id].songErr) {
+                            return (
+                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: 'rgba(255,255,255,0.9)', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>Senpai! There was an error. :(</Text>
+                                </View>
+                            )
+                        } else {
+                            return (
+                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: 'rgba(255,255,255,0.9)', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>*Nyan* Your list is empty</Text>
+                                </View>
+                            )
+                        }
+                    })()
+                }
+            />
+            </React.Fragment>
+        )
+        
+    }
+}
+
 class Anime extends React.Component {
 
     componentDidMount() {
@@ -555,7 +628,7 @@ class Anime extends React.Component {
         } else {
             return (
                 <ImageBackground source={{ uri: this.props.anime[this.props.route.params.id] && this.props.anime[this.props.route.params.id].anime !== null ? this.props.anime[this.props.route.params.id].anime.main_picture.large : null }} style={styles.image}>
-                    <LinearGradient style={{flex: 1}} colors={['rgba(0,0,0,0.1)', '#17009ca0', 'rgba(173,173,173,0.8)','#5c007a']}>
+                    <LinearGradient style={{flex: 1}} colors={['rgba(0,0,0,0.1)', '#17009ca0','#5c007a']}>
                         <Tab.Navigator backBehavior="none" lazy tabBar={props => <MyTabBar {...props} />} style={{ marginTop: 50 + StatusBar.currentHeight }}>
                             <Tab.Screen name='details' options={{ title: 'DETAILS' }}>
                                 {() => <Detail {...this.props} />}
@@ -563,14 +636,17 @@ class Anime extends React.Component {
                             <Tab.Screen name='episodes' options={{ title: 'EPISODES' }}>
                                 {() => <Episode {...this.props} />}
                             </Tab.Screen>
-                            <Tab.Screen name='reviews' options={{ title: 'REVIEWS' }}>
+                            <Tab.Screen name='songs' options={{ title: 'SONGS' }}>
+                                {() => <Songs {...this.props} />}
+                            </Tab.Screen>
+                            <Tab.Screen name='stats' options={{ title: 'STATS' }}>
                                 {() => (
                                     <View style={{ flex: 1, justifyContent: 'center' }}>
                                         <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#fff', fontSize: 16, alignSelf: 'center' }}>Gomen nasai! Under Construction</Text>
                                     </View>
                                 )}
                             </Tab.Screen>
-                            <Tab.Screen name='stats' options={{ title: 'STATS' }}>
+                            <Tab.Screen name='reviews' options={{ title: 'REVIEWS' }}>
                                 {() => (
                                     <View style={{ flex: 1, justifyContent: 'center' }}>
                                         <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#fff', fontSize: 16, alignSelf: 'center' }}>Gomen nasai! Under Construction</Text>

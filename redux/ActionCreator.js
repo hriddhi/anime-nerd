@@ -297,3 +297,31 @@ export const fetchAnimeEpisodesSuccess = (id, data) => ({
     type: ActionTypes.FETCH_ANIME_EPISODES_SUCCESS,
     payload: { episodes: data.episodes, id }
 })
+
+// -------------------------------------------
+
+export const fetchAnimeSongs = (id, name) => (dispatch) => {
+
+    dispatch(fetchAnimeSongsLoading(id))
+    axios.get("https://animenerd.herokuapp.com/anime/song/" + name.replace(/ /g, '-'))
+    .then(res => {
+        console.log(res.data)
+        dispatch(fetchAnimeSongsSuccess(id, res.data))
+    })
+    .catch(err => dispatch(fetchAnimeSongsError(id)))
+}
+
+export const fetchAnimeSongsError = (id) => ({
+    type: ActionTypes.FETCH_ANIME_SONGS_ERROR,
+    payload: id
+})
+
+export const fetchAnimeSongsLoading = (id) => ({
+    type: ActionTypes.FETCH_ANIME_SONGS_LOADING,
+    payload: id
+})
+
+export const fetchAnimeSongsSuccess = (id, data) => ({
+    type: ActionTypes.FETCH_ANIME_SONGS_SUCCESS,
+    payload: { songs: data.data, id: id }
+})
