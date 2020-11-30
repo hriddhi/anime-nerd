@@ -4,7 +4,7 @@ import { Image } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { fetchAnimeCharacter } from '../../redux/ActionCreator'
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, props) => ({
     character: state.character
 })
 

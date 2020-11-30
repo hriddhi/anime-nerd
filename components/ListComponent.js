@@ -55,7 +55,7 @@ class List extends React.Component {
 
     viewAnime = (id) => {
       
-      this.props.navigation.navigate('Anime', { id })
+      this.props.navigation.push('Anime', { id })
     }
 
     render() {

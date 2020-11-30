@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
-import logger from 'redux-logger'
 import Search from './search'
 import Auth from './auth'
 import Anime from './anime'
@@ -9,6 +8,7 @@ import Character from './character'
 import Recommendation from './recommendation'
 import Episode from './episode'
 import List from './list'
+import MAL from './mal'
 import { persistStore, persistReducer } from 'redux-persist'
 
 const persistConfig = {
@@ -27,7 +27,8 @@ const store = createStore(
             list: List,
             character: Character,
             recommendation: Recommendation,
-            episode: Episode
+            episode: Episode,
+            mal: MAL
         })
     ),
     applyMiddleware(thunk)

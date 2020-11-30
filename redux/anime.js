@@ -10,13 +10,6 @@ const Anime = produce((
                 draft[action.payload] = {
                     id: action.payload,
                     isLoading: true,
-                    isUpdating: {
-                        id: null,
-                        status: null,
-                        episode: null,
-                        rating: null
-                    },
-                    isDeleting: null,
                     anime: null,
                     loadingSongs: false,
                     songErr: false,
@@ -27,24 +20,6 @@ const Anime = produce((
             case ActionTypes.FETCH_ANIME_SUCCESS:
                 draft[action.payload.id].isLoading = false
                 draft[action.payload.id].anime = action.payload
-                return
-
-            case ActionTypes.UPDATE_ANIME_STATUS_LOADING:
-                draft[action.payload.id].isUpdating = action.payload
-                return
-
-            case ActionTypes.UPDATE_ANIME_STATUS_SUCCESS:
-                draft[action.payload.id].isUpdating = {
-                    id: null,
-                    status: null,
-                    episode: null,
-                    rating: null
-                }
-                draft[action.payload.id].anime.my_list_status = action.payload
-                return
-
-            case ActionTypes.DELETE_LIST_ANIME_LOADING:
-                draft[action.payload].isDeleting = true
                 return
 
             case ActionTypes.FETCH_ANIME_SONGS_LOADING:

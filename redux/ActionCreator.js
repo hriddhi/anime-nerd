@@ -38,7 +38,7 @@ export const fetchAnime = (id, token) => (dispatch) => {
 
     dispatch(fetchAnimeLoading(id))
 
-    axios.get(`https://api.myanimelist.net/v2/anime/${id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,nsfw,media_type,status,genres,my_list_status,num_episodes,start_season,source,average_episode_duration,rating,related_anime,studios`, {
+    axios.get(`https://api.myanimelist.net/v2/anime/${id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,nsfw,media_type,status,genres,num_episodes,start_season,source,average_episode_duration,rating,related_anime,studios`, {
         headers: {
             'Authorization': 'Bearer ' + token
         }
@@ -59,87 +59,6 @@ export const fetchAnimeLoading = (id) => ({
 export const fetchAnimeSuccess = (data) => ({
     type: ActionTypes.FETCH_ANIME_SUCCESS,
     payload: data
-})
-
-// ------------------------------------------
-
-export const updateAnime = (id, props, token) => (dispatch) => {
-    var obj = {
-        status: null,
-        episode: null,
-        rating: null
-    }
-    
-    const formdata = []
-    if(props.status !== undefined){
-        formdata.push(`status=${props.status.split('-')[0]}`)
-        obj.status = props.status.split('-')[0]
-    }
-    if(props.episode !== undefined){
-        formdata.push(`num_watched_episodes=${props.episode}`)
-        obj.episode = props.episode
-    }
-    if(props.rating !== undefined){
-        formdata.push(`score=${props.rating}`)
-        obj.rating = props.rating
-    }
-
-    dispatch(updateAnimeLoading(id, obj))
-
-    axios.patch(`https://api.myanimelist.net/v2/anime/${id}/my_list_status`, formdata.join('&'), {
-        headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    })
-    .then((res) => {
-        dispatch(updateAnimeSuccess(res.data, id))
-        if(props.status){
-            dispatch(fetchUserAnime(props.status.split('-')[0], token))
-            props.status.split('-')[1] !== undefined ? dispatch(fetchUserAnime(props.status.split('-')[1], token)) : null
-        }
-        dispatch(updateListAnimeSuccess(id, res.data))
-    })
-    .catch((err) => {
-        console.error(err.message)
-    })
-}
-
-export const updateAnimeLoading = (id, props) => ({
-    type: ActionTypes.UPDATE_ANIME_STATUS_LOADING,
-    payload: { id, ...props }
-})
-
-export const updateAnimeSuccess = (data, id) => ({
-    type: ActionTypes.UPDATE_ANIME_STATUS_SUCCESS,
-    payload: { ...data, id }
-})
-
-export const updateListAnimeSuccess = (id, data) => ({
-    type: ActionTypes.UPDATE_LIST_ANIME_SUCCESS,
-    payload: {...data, id}
-})
-
-// -----------------------------------------------
-
-export const deleteListAnime = (id, status, token) => (dispatch) => {
-    dispatch(deleteListAnimeLoading(id))
-
-    axios.delete(`https://api.myanimelist.net/v2/anime/${id}/my_list_status`, {
-        headers: {
-            'Authorization': 'Bearer ' + token
-        }
-    })
-    .then(res => {
-        dispatch(fetchAnime(id, token))
-        dispatch(fetchUserAnime(status, token))
-    })
-    .catch(err => console.error(err.message))
-}
-
-export const deleteListAnimeLoading = (id) => ({
-    type: ActionTypes.DELETE_LIST_ANIME_LOADING,
-    payload: id
 })
 
 // ------------------------------------------------
@@ -368,4 +287,122 @@ export const fetchAnimeEpisodesLoading = (id) => ({
 export const fetchAnimeEpisodesSuccess = (id, data) => ({
     type: ActionTypes.FETCH_ANIME_EPISODES_SUCCESS,
     payload: { episodes: data.episodes, id }
+})
+
+// ------------------------------------------
+
+export const fetchAnimeStatus = (id, token) => (dispatch) => {
+
+    dispatch(fetchAnimeStatusLoading(id))
+
+    console.log(id);
+
+    axios.get(`https://api.myanimelist.net/v2/anime/${id}?fields=id,my_list_status,num_episodes`, {
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    })
+    .then((res) => {
+        dispatch(fetchAnimeStatusSuccess(id, res.data))
+        console.log(res.data)
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
+}
+
+export const fetchAnimeStatusLoading = (id) => ({
+    type: ActionTypes.FETCH_ANIME_STATUS_LOADING,
+    payload: id
+})
+
+export const fetchAnimeStatusSuccess = (id, data) => ({
+    type: ActionTypes.FETCH_ANIME_STATUS_SUCCESS,
+    payload: { id, data }
+})
+
+// --------------------------------------------
+
+export const updateAnime = (id, props, token) => (dispatch) => {
+    var obj = {
+        status: null,
+        episode: null,
+        rating: null
+    }
+    
+    const formdata = []
+    if(props.status !== undefined){
+        formdata.push(`status=${props.status.split('-')[0]}`)
+        obj.status = props.status.split('-')[0]
+    }
+    if(props.episode !== undefined){
+        formdata.push(`num_watched_episodes=${props.episode}`)
+        obj.episode = props.episode
+    }
+    if(props.rating !== undefined){
+        formdata.push(`score=${props.rating}`)
+        obj.rating = props.rating
+    }
+
+    dispatch(updateAnimeLoading(id, obj))
+
+    axios.patch(`https://api.myanimelist.net/v2/anime/${id}/my_list_status`, formdata.join('&'), {
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    })
+    .then((res) => {
+        dispatch(updateAnimeSuccess(res.data, id))
+        if(props.status){
+            dispatch(fetchUserAnime(props.status.split('-')[0], token))
+            props.status.split('-')[1] !== undefined ? dispatch(fetchUserAnime(props.status.split('-')[1], token)) : null
+        }
+        dispatch(updateListAnimeSuccess(id, res.data))
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
+}
+
+export const updateAnimeLoading = (id, props) => ({
+    type: ActionTypes.UPDATE_ANIME_STATUS_LOADING,
+    payload: { id, ...props }
+})
+
+export const updateAnimeSuccess = (data, id) => ({
+    type: ActionTypes.UPDATE_ANIME_STATUS_SUCCESS,
+    payload: { ...data, id }
+})
+
+export const updateListAnimeSuccess = (id, data) => ({
+    type: ActionTypes.UPDATE_LIST_ANIME_SUCCESS,
+    payload: {...data, id}
+})
+
+// -----------------------------------------------
+
+export const deleteListAnime = (id, status, token) => (dispatch) => {
+    dispatch(deleteListAnimeLoading(id))
+
+    axios.delete(`https://api.myanimelist.net/v2/anime/${id}/my_list_status`, {
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    })
+    .then(res => {
+        dispatch(deleteListAnimeSuccess(id))
+        dispatch(fetchUserAnime(status, token))
+    })
+    .catch(err => console.error(err.message))
+}
+
+export const deleteListAnimeLoading = (id) => ({
+    type: ActionTypes.DELETE_LIST_ANIME_LOADING,
+    payload: id
+})
+
+export const deleteListAnimeSuccess = (id) => ({
+    type: ActionTypes.DELETE_LIST_ANIME_SUCCESS,
+    payload: id
 })

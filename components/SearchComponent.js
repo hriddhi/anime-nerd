@@ -62,7 +62,7 @@ class Search extends React.Component {
               containerStyle={{ backgroundColor: 'rgba(255,255,255,0.8)', borderBottomWidth: 0 }}
             />
             <FlatList data={this.props.search.result} style={{ paddingVertical: 4 }} keyboardShouldPersistTaps='handled'
-              renderItem={({ item }) => (
+              keyboardDismissMode='on-drag' renderItem={({ item }) => (
               <TouchableOpacity key={item.node.id} activeOpacity={0.7} onPress={()=>this.viewAnime(item.node.id)}>
                 <ListItem key={item.node.id} containerStyle={{padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.6)', height: 130, overflow: 'hidden' }} bottomDivider>
                   <Image source={{ uri: item.node.main_picture ? item.node.main_picture.medium : placeholder }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 90, height: 130 }} />

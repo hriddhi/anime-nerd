@@ -18,7 +18,6 @@ const Recommendation = produce((
                 draft[action.payload.id].isLoading = false
                 draft[action.payload.id].recommendation = action.payload.recommendation.recommendations
                 draft[action.payload.id].err = null
-                console.log(draft[action.payload.id].recommendation)
                 return
 
             case ActionTypes.FETCH_ANIME_RELATED_FAILED:
