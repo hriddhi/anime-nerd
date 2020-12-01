@@ -1,6 +1,7 @@
 import React from 'react';
 import { SafeAreaView, StyleSheet, ScrollView, View, StatusBar, Linking, Text, Image } from 'react-native';
 import { Button, Icon } from 'react-native-elements'
+import Web from './WebViewComponent'
 import { connect } from 'react-redux';
 import { getToken } from '../redux/ActionCreator'
 import LinearGradient from 'react-native-linear-gradient';
@@ -39,7 +40,7 @@ class Login extends React.Component {
                     type='outline'
                     titleStyle={styles.buttonText}
                     buttonStyle={styles.buttonStyle}
-                    onPress={() => Linking.openURL('https://animenerd.herokuapp.com/auth') }
+                    onPress={()=>this.props.navigation.navigate('Web',{ uri: 'https://animenerd.herokuapp.com/auth' })}
                 />
             </View>
         );

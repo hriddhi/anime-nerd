@@ -111,7 +111,7 @@ class Songs extends React.PureComponent {
             </View>
             <View style={{ flexDirection: 'row', paddingVertical: 4, paddingRight: 8, height: 48, backgroundColor: 'rgba(255,255,255,0.8)', marginHorizontal: 8, marginBottom: 4, borderRadius: 10 }}>
                 <Icon name="spotify" type='font-awesome' size={32} color="#028200" style={{ paddingHorizontal: 8, paddingTop: 4 }} />
-                <Text style={{ flex: 1, fontSize: 14, fontFamily: 'SpaceGrotesk-Medium' }}>All song will open directly on Spotify. Songs available only on Spotify is shown</Text>
+                <Text style={{ flex: 1, fontSize: 14, fontFamily: 'SpaceGrotesk-Medium' }}>All song will open directly on Spotify. Songs available only on Spotify are shown.</Text>
             </View>
             <FlatList data={this.props.anime.songs} 
                 renderItem={({ item, index }) => (
@@ -174,24 +174,21 @@ class Anime extends React.PureComponent {
     }
 
     componentDidMount() {
-        console.log('mounting')
-        if(this.props.anime === undefined)
-            this.props.fetchAnime(this.props.route.params.id, this.props.access_token)
-        else {
-            console.log(this.props.anime.anime.title)
-            setTimeout(() => this.setState({ didFinishInitialAnimation: true }), 0) 
-        }
+        setTimeout(()=>{
+            if(this.props.anime === undefined)
+                this.props.fetchAnime(this.props.route.params.id, this.props.access_token)
+            else
+                setTimeout(() => this.setState({ didFinishInitialAnimation: true }), 0) 
+        }, 0)
     }
 
     componentDidUpdate() {
-        console.log('updating')
         this.setState({ didFinishInitialAnimation: true })
     }
 
     render() {
-        
             return (
-                <ImageBackground source={{ uri: this.props.anime && this.props.anime.anime !== null ? this.props.anime.anime.main_picture ? this.props.anime.anime.main_picture.large : null : null }} style={styles.image}>
+                <ImageBackground source={{ uri: this.props.anime && this.props.anime.anime !== null ? this.props.anime.anime.image_url ? this.props.anime.anime.image_url : null : null }} style={styles.image}>
                     <LinearGradient style={{flex: 1}} colors={['rgba(0,0,0,0.1)', '#17009ca0','#5c007a']}>
                         <Header
                             leftComponent={<Icon name="arrow-left" type='font-awesome' size={20} color="white" style={{ padding: 16 }} onPress={()=>this.props.navigation.pop()} />}
@@ -214,12 +211,11 @@ class Anime extends React.PureComponent {
                                     } else {
                                         return <Info id={this.props.route.params.id} navigation={this.props.navigation}/>
                                     }
-                                    
                                 } 
                             }
                             </Tab.Screen>
                             <Tab.Screen name='episodes' options={{ title: 'EPISODES' }}>
-                                {() => <Episode id={this.props.route.params.id} />}
+                                {() => <Episode id={this.props.route.params.id} navigation={this.props.navigation} />}
                             </Tab.Screen>
                             <Tab.Screen name='songs' options={{ title: 'SONGS' }}>
                                 {() => <Songs {...this.props} />}
@@ -263,51 +259,5 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-    },
-    modalView: {
-        backgroundColor: "rgba(255,255,255,0.8)",
-        borderRadius: 20,
-        padding: 16,
-        alignItems: 'center',
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5
-    },
-    modalViewEpisodes: {
-        backgroundColor: "rgba(255,255,255,0.9)",
-        borderRadius: 20,
-        padding: 12,
-        alignItems: 'center',
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5
-    },
-    modalHeading: {
-        fontFamily: 'SpaceGrotesk-Bold',
-        marginBottom: 16,
-        fontSize: 18
-    },
-    modalStatusButtons: {
-        borderColor: '#000',
-        borderWidth: 1,
-        borderRadius: 20,
-        width: 180,
-    },
-    modalStatusButtonsActive: {
-        borderColor: '#000',
-        borderWidth: 1,
-        borderRadius: 20,
-        width: 180,
-        backgroundColor: '#a1a1a1'
     }
 });

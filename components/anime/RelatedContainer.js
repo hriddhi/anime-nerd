@@ -2,26 +2,27 @@ import React from 'react';
 import { FlatList, View, Text, ActivityIndicator, TouchableOpacity, Image as Image1 } from 'react-native';
 import { Image } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { fetchAnimeRecommendation } from '../../redux/ActionCreator'
+import { fetchAnimeRelated } from '../../redux/ActionCreator'
 import TextTicker from 'react-native-text-ticker'
 
 const mapStateToProps = state => ({
-    recommendation: state.recommendation
+    token: state.auth.access_token,
+    related: state.related
 })
 
 const mapDispatchToProps = dispatch => ({
-    fetchAnimeRecommendation: (id) => dispatch(fetchAnimeRecommendation(id))
+    fetchAnimeRelated: (id, token) => dispatch(fetchAnimeRelated(id, token))
 })
 
-class Recommendation extends React.PureComponent {
+class Related extends React.PureComponent {
 
     state = {
-        recom_scroll_id: null
+        related_scroll_id: null
     };
 
     componentDidMount() {
-        if(this.props.recommendation[this.props.id] === undefined)
-            this.props.fetchAnimeRecommendation(this.props.id)
+        if(this.props.related[this.props.id] === undefined)
+            this.props.fetchAnimeRelated(this.props.id, this.props.token)
     }
 
     viewAnime = (id) => {
@@ -31,39 +32,39 @@ class Recommendation extends React.PureComponent {
     render() {
         return (
             <View horizontal style={{flex: 1, height: 228, backgroundColor: 'rgba(255,255,255,0.8)', marginTop: 8, borderRadius: 10}}>
-                <Text style={{ fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingLeft: 12, padding: 8 }}>Recommendations</Text>
+                <Text style={{ fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingLeft: 12, padding: 8 }}>Related</Text>
                 {
                     (() => {
-                        if(this.props.recommendation[this.props.id] && this.props.recommendation[this.props.id].err){
+                        if(this.props.related[this.props.id] && this.props.related[this.props.id].err){
                             return (
                                 <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center'  }}>
                                     <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#000', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>An unexpected error occured</Text>
                                 </View>
                             )
-                        } else if(this.props.recommendation[this.props.id] && this.props.recommendation[this.props.id].isLoading){
+                        } else if(this.props.related[this.props.id] && this.props.related[this.props.id].isLoading){
                             return (
                                 <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center' }}>
-                                    <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#000', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>Loading Recommendations...</Text>
+                                    <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#000', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>Loading Related Animes...</Text>
                                 </View>
                             )
-                        } else if(this.props.recommendation[this.props.id]) {
-                            if(this.props.recommendation[this.props.id].recommendation.length === 0){
+                        } else if(this.props.related[this.props.id]) {
+                            if(this.props.related[this.props.id].related.length === 0){
                                 return (
                                     <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center' }}>
                                         <Image1 resizeMode='contain' source={require('../game_boy_icon_black.png')} style={{ height: 110, alignSelf: 'center'}}/>
-                                        <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#000', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>No Recommendations found</Text>
+                                        <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#000', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>No Related Animes found</Text>
                                     </View>
                                 )
                             }
                             return (
-                                <FlatList horizontal data={this.props.recommendation[this.props.id].recommendation} 
+                                <FlatList horizontal data={this.props.related[this.props.id].related} 
                                     showsHorizontalScrollIndicator={false}
                                     style={{ left: 0, bottom: 8, position: 'absolute', marginHorizontal: -12 }}
                                     contentContainerStyle={{ paddingHorizontal: 18 }}
                                     renderItem={({ item, index }) => (
-                                    <TouchableOpacity activeOpacity={0.9} key={index} onPress={()=>this.viewAnime(item.mal_id)} onPressIn={()=>this.setState({ recom_scroll_id: item.mal_id })} onPressOut={()=>this.setState({ recom_scroll_id: null })}>
+                                    <TouchableOpacity activeOpacity={0.9} key={index} onPress={()=>this.viewAnime(item.node.id)} onPressIn={()=>this.setState({ related_scroll_id: item.node.id })} onPressOut={()=>this.setState({ related_scroll_id: null })}>
                                         <View style={{ marginHorizontal: 4, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
-                                            <Image source={{ uri: item.image_url }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 120, height: 180, flex: 1 }}/>
+                                            <Image source={{ uri: item.node.main_picture.medium }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 120, height: 180, flex: 1 }}/>
                                             <View style={{ padding: 4, position: 'absolute', bottom: 0, backgroundColor: 'rgba(255,255,255,0.9)', width: '100%', zIndex: 1 }}>
                                                 <TextTicker
                                                     numberOfLines={1}
@@ -73,15 +74,16 @@ class Recommendation extends React.PureComponent {
                                                     bounce
                                                     repeatSpacer={50}
                                                     marqueeDelay={200}
-                                                    disabled={ this.state.recom_scroll_id === item.mal_id ? false : true }
+                                                    disabled={ this.state.related_scroll_id === item.node.id ? false : true }
                                                 >
-                                                    {item.title}
+                                                    {item.node.title}
                                                 </TextTicker>
+                                                <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Medium', fontSize: 10 }}>{item.relation_type_formatted}</Text>
                                             </View>
                                         </View>
                                     </TouchableOpacity>
                                     )}
-                                    keyExtractor={(item, index) => index.toString()}
+                                    keyExtractor={(item, index) => index.toString()} 
                                 />
                             )
                         }
@@ -93,4 +95,4 @@ class Recommendation extends React.PureComponent {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Recommendation)
+export default connect(mapStateToProps, mapDispatchToProps)(Related)

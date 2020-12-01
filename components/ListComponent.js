@@ -71,7 +71,7 @@ class List extends React.Component {
               <FlatList data={data.data} onRefresh={this.onRefresh} refreshing={(Boolean)(this.props.list.isLoading[this.props.type] && this.props.list[this.props.type])} 
                 renderItem={({ item }) => (
                 <TouchableOpacity key={item.node.id} activeOpacity={0.7} onPress={()=>this.viewAnime(item.node.id)}>
-                  <ListItem key={item.node.id} containerStyle={{height: 120, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.6)', overflow: 'hidden' }}>
+                  <ListItem key={item.node.id} containerStyle={{height: 120, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.7)', overflow: 'hidden' }}>
                     <Image source={{ uri: item.node.main_picture.medium }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 85, height: '100%'  }} />
                     <View style={{ height: '100%', paddingRight: 16, paddingVertical: 8, flex: 1 }}>
                       <Text style={{ flexShrink: 1, fontSize: 16, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%'}}>{item.node.title}</Text>

@@ -3,12 +3,19 @@ import React from 'react';
 import { StatusBar, View, Text } from 'react-native'
 import { SearchBar, Input, ThemeProvider, Icon } from 'react-native-elements';
 import Setting from './SettingComponent'
+import Search from './SearchComponent';
+import Anime from './AnimeComponent'
+import Web from './WebViewComponent'
 import Tab from './TabComponent'
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { enableScreens } from 'react-native-screens'
+import { createNativeStackNavigator } from 'react-native-screens/native-stack'
 import SplashScreen from 'react-native-splash-screen'
+import LinearGradient from 'react-native-linear-gradient'
 
-const BottomTab = createMaterialBottomTabNavigator();
+enableScreens()
+const Stack = createNativeStackNavigator();
 
 class Main extends React.Component {
 
@@ -18,27 +25,18 @@ class Main extends React.Component {
 
   render() {
     return (
-     
       
-        
+      <LinearGradient style={{flex: 1}} colors={['#17009c','#5c007a']}>
         <NavigationContainer theme={{ colors: { background: 'rgba(0,0,0,0)', labelStyle: { color: '#fff', fontFamily: 'SpaceGrotesk-SemiBold' } } }}>
-          <BottomTab.Navigator activeColor='#fff' inactiveColor='grey' barStyle={{ backgroundColor: '#5c007a' }}>
-            <BottomTab.Screen name="Home" 
-              component={Tab}
-              options={{ 
-                tabBarLabel: <Text style={{ fontSize: 12, fontFamily: 'SpaceGrotesk-SemiBold' }}>HOME</Text>,
-                tabBarIcon: ({focused}) => <Icon name='home' size={ focused ? 24 : 22 } type='font-awesome' color={ focused ? '#fff' : 'grey' }/>
-              }}
-            />
-            <BottomTab.Screen name="Settings" 
-              component={Setting}
-              options={{ 
-                tabBarLabel: <Text style={{ fontSize: 12, fontFamily: 'SpaceGrotesk-SemiBold' }}>SETTINGS</Text>,
-                tabBarIcon: ({focused}) => <Icon name='gear' size={ focused ? 24 : 22 } type='font-awesome' color={ focused ? '#fff' : 'grey' }/>
-              }}
-            />
-          </BottomTab.Navigator>
-        </NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name="Tab" component={Tab} options={{ headerShown: false, stackAnimation: 'none' }}/>
+            <Stack.Screen name="Search" component={Search} options={{ headerShown: false, stackAnimation: 'fade' }} />
+            <Stack.Screen name="Anime" component={Anime} options={{ headerShown: false, stackAnimation: 'fade' }} />
+            <Stack.Screen name="Web" component={Web} options={{ headerShown: false, stackAnimation: 'fade' }} />
+          </Stack.Navigator>
+      </NavigationContainer>
+      </LinearGradient>
+        
       
    
     );

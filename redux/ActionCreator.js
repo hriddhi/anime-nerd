@@ -6,6 +6,10 @@ export const getToken = (token) => ({
     payload: token
 })
 
+export const logout = () => ({
+    type: ActionTypes.LOGOUT
+})
+
 // ---------------------------------------------------
 
 export const updateSearch = (str, token) => (dispatch) => {
@@ -38,11 +42,7 @@ export const fetchAnime = (id, token) => (dispatch) => {
 
     dispatch(fetchAnimeLoading(id))
 
-    axios.get(`https://api.myanimelist.net/v2/anime/${id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,nsfw,media_type,status,genres,num_episodes,start_season,source,average_episode_duration,rating,related_anime,studios`, {
-        headers: {
-            'Authorization': 'Bearer ' + token
-        }
-    })
+    axios.get(`https://api.jikan.moe/v3/anime/${id}`)
     .then((res) => {
         dispatch(fetchAnimeSuccess(res.data))
     })
@@ -58,7 +58,31 @@ export const fetchAnimeLoading = (id) => ({
 
 export const fetchAnimeSuccess = (data) => ({
     type: ActionTypes.FETCH_ANIME_SUCCESS,
-    payload: data
+    payload: {
+        "id": data.mal_id,
+        "url": data.url,
+        "image_url": data.image_url,
+        "title": data.title,
+        "title_english": data.title_english,
+        "title_japanese": data.title_japanese,
+        "media_type": data.type,
+        "source": data.source,
+        "num_episodes": data.episodes,
+        "status": data.status,
+        "airing": data.airing,
+        "aired": data.aired.string,
+        "duration": data.duration,
+        "rating": data.rating,
+        "mean": data.score,
+        "rank": data.rank,
+        "popularity": data.popularity,
+        "synopsis": data.synopsis,
+        "premiered": data.premiered,
+        "related": data.related,
+        "producers": data.producers,
+        "studios": data.producers,
+        "genres": data.genres
+    }
 })
 
 // ------------------------------------------------
@@ -190,11 +214,9 @@ export const fetchCompletedSuccess = (data) => ({
 // -------------------------------------------
 
 export const fetchAnimeSongs = (id, name) => (dispatch) => {
-
     dispatch(fetchAnimeSongsLoading(id))
     axios.get("https://animenerd.herokuapp.com/anime/song/" + name.replace(/ /g, '-'))
     .then(res => {
-        console.log(res.data)
         dispatch(fetchAnimeSongsSuccess(id, res.data))
     })
     .catch(err => dispatch(fetchAnimeSongsError(id)))
@@ -240,6 +262,28 @@ export const fetchAnimeCharacterSuccess = (id, character) => ({
     payload: { id, character }
 })
 
+// ----------------
+
+export const fetchCharacterDetail = (url) => (dispatch) => {
+    console.log(url.substring(url.lastIndexOf('/') + 1))
+    // axios.get(url)
+    // .then((res) => {
+
+    // })
+    // .catch((err) => {
+    //     console.error(err.message)
+    // })
+}
+
+export const fetchCharacterDetailLoading = () => ({
+    type: ActionTypes.FETCH_CHARACTER_DETAIL_LOADING
+})
+
+export const fetchCharacterDetailSuccess = (data) => ({
+    type: ActionTypes.FETCH_CHARACTER_DETAIL_SUCCESS,
+    payload: data
+})
+
 // -----
 
 export const fetchAnimeRecommendation = (id) => (dispatch) => {
@@ -265,10 +309,40 @@ export const fetchAnimeRecommendationSuccess = (id, recommendation) => ({
     payload: { id, recommendation }
 })
 
+// ---------------
+
+export const fetchAnimeRelated = (id, token) => (dispatch) => {
+    dispatch(fetchAnimeRelatedLoading(id))
+
+    axios.get(`https://api.myanimelist.net/v2/anime/${id}?fields=id,related_anime`, {
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    })
+    .then((res) => {
+        dispatch(fetchAnimeRelatedSuccess(id, res.data))
+        console.log(res.data)
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
+}
+
+export const fetchAnimeRelatedLoading = (id) => ({
+    type: ActionTypes.FETCH_ANIME_RELATED_LOADING,
+    payload: id
+})
+
+export const fetchAnimeRelatedSuccess = (id, related) => ({
+    type: ActionTypes.FETCH_ANIME_RELATED_SUCCESS,
+    payload: related
+})
+
 // ------------------
 
 export const fetchAnimeEpisodes = (id) => (dispatch) => {
 
+    console.log('fetching episodes')
     dispatch(fetchAnimeEpisodesLoading(id))
     axios.get(`https://api.jikan.moe/v3/anime/${id}/episodes`)
     .then((res) => {
@@ -295,8 +369,6 @@ export const fetchAnimeStatus = (id, token) => (dispatch) => {
 
     dispatch(fetchAnimeStatusLoading(id))
 
-    console.log(id);
-
     axios.get(`https://api.myanimelist.net/v2/anime/${id}?fields=id,my_list_status,num_episodes`, {
         headers: {
             'Authorization': 'Bearer ' + token
@@ -304,7 +376,6 @@ export const fetchAnimeStatus = (id, token) => (dispatch) => {
     })
     .then((res) => {
         dispatch(fetchAnimeStatusSuccess(id, res.data))
-        console.log(res.data)
     })
     .catch((err) => {
         console.error(err.message)

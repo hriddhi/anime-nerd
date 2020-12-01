@@ -20,7 +20,7 @@ const Recommendation = produce((
                 draft[action.payload.id].err = null
                 return
 
-            case ActionTypes.FETCH_ANIME_RELATED_FAILED:
+            case ActionTypes.FETCH_ANIME_RECOMMEND_FAILED:
                 draft[action.payload.id].isLoading = false
                 draft[action.payload.id].err = action.payload.err
                 return

@@ -41,7 +41,7 @@ class Episode extends React.PureComponent {
             return (
                 <FlatList data={this.props.episode[this.props.id].episodes} 
                     renderItem={({ item, index }) => (
-                    <TouchableOpacity key={index} activeOpacity={0.7}>
+                    <TouchableOpacity key={index} activeOpacity={0.7} onPress={()=>this.props.navigation.navigate('Web', { uri: item.forum_url })}>
                     <ListItem key={index} containerStyle={{height: 80, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.8)', overflow: 'hidden' }}>
                         <View style={{ backgroundColor: 'rgba(0,0,0,0.3)', width: 70, height: '100%', display: 'flex', justifyContent: "center", alignItems: "center" }}>
                             <Text style={{ fontSize: 22, fontFamily: 'SpaceGrotesk-SemiBold' }}>#{item.episode_id}</Text>

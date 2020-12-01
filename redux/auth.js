@@ -12,6 +12,10 @@ const Auth = produce((
                 draft.access_token = action.payload
                 return
 
+            case ActionTypes.LOGOUT:
+                draft.access_token = null
+                return
+
             default:
                 return draft;
         }

@@ -49,6 +49,7 @@ class MAL extends React.PureComponent {
 
     setmodal_rating = () => {
         this.setState({ modal_rating: !this.state.modal_rating });
+        console.log(this.state.rating_changed)
         if(this.props.mal && this.state.rating_changed !== false)
             this.props.updateAnime(this.props.id, { rating: this.state.rating_changed }, this.props.access_token)
         if(this.state.rating_changed !== false)
@@ -169,7 +170,7 @@ class MAL extends React.PureComponent {
                                     itemTextFontFamily='SpaceGrotesk-SemiBold' 
                                     selectedItem={anime.rating} 
                                     data={ ['0 Not Rated', '1 Appalling', '2 Horrible', '3 Very Bad', '4 Bad', '5 Average', '6 Fine', '7 Good', '8 Very Good', '9 Great', '10 Masterpiece'] } 
-                                    onItemSelected={ (val) => { if(anime.score !== val) this.setState({ rating_changed : val }) } } 
+                                    onItemSelected={ (val) => { if(anime.rating !== val) this.setState({ rating_changed : val }) } } 
                                 />
                             </View>
                         </View>
@@ -183,7 +184,7 @@ class MAL extends React.PureComponent {
         if(this.props.mal && this.props.mal.status){
             return (
                 <React.Fragment>
-                    <View style={{flex: 1, overflow: 'hidden', flexDirection: 'row',  backgroundColor: 'rgba(255,255,255,0.8)', marginHorizontal: 8, marginBottom: 8, borderRadius: 36 }}>
+                    <View style={{flex: 1, overflow: 'hidden', flexDirection: 'row',  backgroundColor: 'rgba(255,255,255,0.8)', marginBottom: 8, borderRadius: 36 }}>
                         <View style={{flex: 1, flexGrow: 3}}>
                             <Button title={ this.getStatus() } 
                                 type='outline' 
@@ -243,7 +244,7 @@ class MAL extends React.PureComponent {
             )
         } else {
             return (
-                <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.7)', marginHorizontal: 8, marginBottom: 8, borderRadius: 36 }}>
+                <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.8)', marginBottom: 8, borderRadius: 36 }}>
                     <View style={{flex: 1, flexGrow: 2}}>
                         <Button title='Add to Profile' 
                             type='outline' 

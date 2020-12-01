@@ -2,14 +2,15 @@ import React from 'react';
 import { FlatList, View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Image } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { fetchAnimeCharacter } from '../../redux/ActionCreator'
+import { fetchAnimeCharacter, fetchCharacterDetail } from '../../redux/ActionCreator'
 
 const mapStateToProps = (state, props) => ({
     character: state.character
 })
 
 const mapDispatchToProps = dispatch => ({
-    fetchAnimeCharacter: (id) => dispatch(fetchAnimeCharacter(id))
+    fetchAnimeCharacter: (id) => dispatch(fetchAnimeCharacter(id)),
+    fetchCharacterDetail: (url) => dispatch(fetchCharacterDetail(url))
 })
 
 class Character extends React.PureComponent {
@@ -21,7 +22,7 @@ class Character extends React.PureComponent {
 
     render() {
         return (
-            <View horizontal style={{flex: 1, height: 198, backgroundColor: 'rgba(255,255,255,0.8)', marginTop: 8, marginHorizontal: 8, borderRadius: 10}}>
+            <View horizontal style={{flex: 1, height: 198, backgroundColor: 'rgba(255,255,255,0.8)', marginTop: 8, borderRadius: 10}}>
                 <Text style={{ fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingLeft: 12, padding: 8 }}>Characters</Text>
                 {
                     (() => {
@@ -44,7 +45,7 @@ class Character extends React.PureComponent {
                                     style={{ left: 0, bottom: 8, position: 'absolute', marginHorizontal: -12 }}
                                     contentContainerStyle={{ paddingHorizontal: 18 }}
                                     renderItem={({ item, index }) => (
-                                        <TouchableOpacity activeOpacity={0.9} key={index} >
+                                        <TouchableOpacity activeOpacity={0.9} key={index} onPress={()=>this.props.navigation.navigate('Web', { uri: item.url })} >
                                             <View style={{ marginHorizontal: 4, position: 'relative', borderRadius: 8, overflow: 'hidden' }}>
                                                 <Image source={{ uri: item.image_url }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 100, height: 150, flex: 1 }}/>
                                                 <View style={{ padding: 4, position: 'absolute', bottom: 0, backgroundColor: 'rgba(255,255,255,0.9)', width: '100%', zIndex: 1 }}>

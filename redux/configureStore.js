@@ -5,6 +5,7 @@ import Search from './search'
 import Auth from './auth'
 import Anime from './anime'
 import Character from './character'
+import Related from './related'
 import Recommendation from './recommendation'
 import Episode from './episode'
 import List from './list'
@@ -26,6 +27,7 @@ const store = createStore(
             anime: Anime,
             list: List,
             character: Character,
+            related: Related,
             recommendation: Recommendation,
             episode: Episode,
             mal: MAL
