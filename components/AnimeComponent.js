@@ -1,16 +1,15 @@
 import React, { useRef, useEffect } from 'react';
-import { StyleSheet, FlatList, InteractionManager, ScrollView, View, Text, ActivityIndicator, ImageBackground, Modal, TouchableOpacity, TouchableWithoutFeedback, Linking } from 'react-native';
-import { Avatar, ListItem, Image, Badge, Button, Icon, Divider, Header } from 'react-native-elements';
+import { StyleSheet, FlatList, ScrollView, View, Text, ActivityIndicator, ImageBackground, Modal, TouchableOpacity, TouchableWithoutFeedback, Linking } from 'react-native';
+import { Avatar, ListItem, Icon, Tooltip, Header, SocialIcon } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { updateAnime, fetchAnime, deleteListAnime, fetchAnimeSongs, fetchAnimeEpisodes } from '../redux/ActionCreator'
+import { updateAnime, fetchAnime, deleteListAnime, fetchAnimeSongs } from '../redux/ActionCreator'
 import LinearGradient from 'react-native-linear-gradient'
-import { WheelPicker } from 'react-native-wheel-picker-android'
-import TextTicker from 'react-native-text-ticker'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import Animated from 'react-native-reanimated';
 
 import Episode from './anime/EpisodeComponent'
 import Info from './anime/InfoComponent'
+import Stats from './anime/StatsComponent'
 
 const mapStateToProps = (state, props) => ({
     anime: state.anime[props.route.params.id],
@@ -98,8 +97,31 @@ function MyTabBar({ state, descriptors, navigation, position }) {
 
 class Songs extends React.PureComponent {
 
+    state = {
+        songs: []
+    }
+
     componentDidMount(){
-        this.props.fetchAnimeSongs(this.props.route.params.id, this.props.anime.anime.title)
+        var temp = []
+        this.props.anime.anime.opening_themes.forEach(e => {
+            var tag = e.substring(e.indexOf('#') + 1, e.indexOf(':'))
+            temp.push({ 
+                name: e.substring(e.indexOf('\"') + 1, e.lastIndexOf('\"')),
+                ep: e.lastIndexOf('(ep') !== -1 ? e.substring(e.lastIndexOf('(ep') + 1, e.length - 1).toUpperCase() : null,
+                tag: 'OPENING' + (tag !== '' ? ' ' + tag  : '')
+            })
+        });
+
+        this.props.anime.anime.ending_themes.forEach(e => {
+            var tag = e.substring(e.indexOf('#') + 1, e.indexOf(':'))
+            temp.push({ 
+                name: e.substring(e.indexOf('\"') + 1, e.lastIndexOf('\"')),
+                ep: e.lastIndexOf('(ep') !== -1 ? e.substring(e.lastIndexOf('(ep') + 1, e.length - 1).toUpperCase() : null,
+                tag: 'ENDING' + (tag !== '' ? ' ' + tag  : '')
+            })
+        });
+
+        this.setState({ songs: temp })
     }
 
     render(){
@@ -109,44 +131,70 @@ class Songs extends React.PureComponent {
                 <Icon name="exclamation-triangle" type='font-awesome' size={28} color="#b0a100" style={{ padding: 8 }} />
                 <Text style={{ flex: 1, fontSize: 14, fontFamily: 'SpaceGrotesk-Medium' }}>Sometimes, songs might not work as intended. Gomen nasai!</Text>
             </View>
-            <View style={{ flexDirection: 'row', paddingVertical: 4, paddingRight: 8, height: 48, backgroundColor: 'rgba(255,255,255,0.8)', marginHorizontal: 8, marginBottom: 4, borderRadius: 10 }}>
-                <Icon name="spotify" type='font-awesome' size={32} color="#028200" style={{ paddingHorizontal: 8, paddingTop: 4 }} />
-                <Text style={{ flex: 1, fontSize: 14, fontFamily: 'SpaceGrotesk-Medium' }}>All song will open directly on Spotify. Songs available only on Spotify are shown.</Text>
-            </View>
-            <FlatList data={this.props.anime.songs} 
+            <FlatList data={this.state.songs} 
                 renderItem={({ item, index }) => (
                     <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} style={{flex: 1, borderRadius: 10, marginVertical: 3, marginHorizontal: 8}} colors={['rgba(255,255,255,0.9)', '#009129']}>
-                        
                         <ListItem key={index} containerStyle={{height: 70, padding: 0, backgroundColor: 'rgba(0,0,0,0.2)', overflow: 'hidden' }}>
                             <View style={{ backgroundColor: 'rgba(255,255,255,0)', width: 70, height: '100%', display: 'flex', justifyContent: "center", alignItems: "center" }}>
                                 <Text style={{ fontSize: 22, fontFamily: 'SpaceGrotesk-SemiBold' }}>#{index + 1}</Text>
                             </View>
                             <View style={{ height: '100%', paddingRight: 16, paddingVertical: 8, flex: 1 }}>
                                 <Text numberOfLines={1} style={{ flexShrink: 1,  fontSize: 16, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%'}}>{item.name}</Text>
-                                <View style={{ flex: 1, flexDirection: 'row', marginTop: 8 }}>
+                                <View style={{ flex: 1, flexDirection: 'row', marginTop: 9 }}>
                                     <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 50}}>{item.tag.toUpperCase()}</Text>
-                                    <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 50}}>{item.link.substring(item.link.indexOf('/',10) + 1, item.link.lastIndexOf('/')).toUpperCase()}</Text>
+                                    { item.ep ? <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 50}}>{item.ep}</Text> : null }
                                 </View>
                             </View> 
-                            <TouchableOpacity key={index} activeOpacity={0.4} onPress={() => Linking.openURL(item.link)}>
+                            <Tooltip popover={
+                                <View style={{ flex: 1, flexDirection: 'row' }}>
+                                    <SocialIcon
+                                        type='soundcloud'
+                                        style={{ height: 50, width: 50 }}
+                                        button
+                                        onPress={()=>Linking.openURL('https://soundcloud.com/search/results?q=' + item.name.replace(' ', '%20'))}
+                                    />
+                                    <SocialIcon
+                                        type='youtube'
+                                        style={{ height: 50, width: 50 }}
+                                        button
+                                        onPress={()=>Linking.openURL('https://youtube.com/results?search_query=' + item.name.replace(' ', '%20'))}
+                                    />
+                                    <SocialIcon
+                                        type='spotify'
+                                        iconColor='#fff'
+                                        iconType='font-awesome-5'
+                                        style={{ backgroundColor: 'green', height: 50, width: 50, padding: 0 }}
+                                        iconSize={26}
+                                        button
+                                        onPress={()=>Linking.openURL('https://open.spotify.com/search/' + item.name.replace(' ', '%20'))}
+
+                                    />
+                                    </View>
+                                }
+                                withPointer={false}
+                                backgroundColor='#fff'
+                                withOverlay={false}
+                                width={194}
+                                containerStyle={{ margin: 4, height: 64, padding: 0, borderRadius: 32 }}
+                            >
                                 <View style={{ borderRadius: 20, borderWidth: 4, backgroundColor: 'rgba(0,0,0,0.3)', borderColor: 'rgba(0,0,0,0.8)', height: 40, width: 40, justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
                                     <Icon name="play" type='font-awesome' size={18} color="rgba(0,171,122,0.8)" style={{ marginLeft: 2 }} />
                                 </View>
-                            </TouchableOpacity>
+                            </Tooltip>
                         </ListItem>
                     </LinearGradient>
                 )}
                 keyExtractor={(item, index) => index.toString()} 
                 ListEmptyComponent={
                     (() => {
-                        if(this.props.anime.loadingSongs){
+                        if(this.props.anime.isLoading){
                             return (
                                 <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center'  }}>
                                     <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: 'rgba(255,255,255,0.9)', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>*Nyan* Loading Songs</Text>
                                     <ActivityIndicator size='large' color='#fff' />
                                 </View>
                             )
-                        } else if(this.props.anime.songErr) {
+                        } else if(this.props.anime.err) {
                             return (
                                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                                     <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: 'rgba(255,255,255,0.9)', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>Senpai! There was an error. :(</Text>
@@ -221,11 +269,7 @@ class Anime extends React.PureComponent {
                                 {() => <Songs {...this.props} />}
                             </Tab.Screen>
                             <Tab.Screen name='stats' options={{ title: 'STATS' }}>
-                                {() => (
-                                    <View style={{ flex: 1, justifyContent: 'center' }}>
-                                        <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#fff', fontSize: 16, alignSelf: 'center' }}>Gomen nasai! Under Construction</Text>
-                                    </View>
-                                )}
+                                {() => <Stats id={this.props.route.params.id} />}
                             </Tab.Screen>
                             <Tab.Screen name='reviews' options={{ title: 'REVIEWS' }}>
                                 {() => (

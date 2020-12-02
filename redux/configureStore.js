@@ -10,6 +10,7 @@ import Recommendation from './recommendation'
 import Episode from './episode'
 import List from './list'
 import MAL from './mal'
+import Stats from './stats'
 import { persistStore, persistReducer } from 'redux-persist'
 
 const persistConfig = {
@@ -30,7 +31,8 @@ const store = createStore(
             related: Related,
             recommendation: Recommendation,
             episode: Episode,
-            mal: MAL
+            mal: MAL,
+            stats: Stats
         })
     ),
     applyMiddleware(thunk)

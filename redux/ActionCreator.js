@@ -81,7 +81,9 @@ export const fetchAnimeSuccess = (data) => ({
         "related": data.related,
         "producers": data.producers,
         "studios": data.producers,
-        "genres": data.genres
+        "genres": data.genres,
+        "opening_themes": data.opening_themes,
+        "ending_themes": data.ending_themes
     }
 })
 
@@ -476,4 +478,29 @@ export const deleteListAnimeLoading = (id) => ({
 export const deleteListAnimeSuccess = (id) => ({
     type: ActionTypes.DELETE_LIST_ANIME_SUCCESS,
     payload: id
+})
+
+// -------------
+
+export const fetchAnimeStats = (id) => (dispatch) => {
+
+    dispatch(fetchAnimeStatsLoading(id))
+
+    axios.get(`https://api.jikan.moe/v3/anime/${id}/stats`)
+    .then((res) => {
+        dispatch(fetchAnimeStatsSuccess(id, res.data))
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
+}
+
+export const fetchAnimeStatsLoading = (id) => ({
+    type: ActionTypes.FETCH_ANIME_STATS_LOADING,
+    payload: id
+})
+
+export const fetchAnimeStatsSuccess = (id, data) => ({
+    type: ActionTypes.FETCH_ANIME_STATS_SUCCESS,
+    payload: { id, stats: data }
 })

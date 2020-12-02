@@ -1,9 +1,8 @@
 import React, { useRef, useEffect } from 'react';
-import { StyleSheet, FlatList, InteractionManager, ScrollView, View, Text, ActivityIndicator, ImageBackground, Modal, TouchableOpacity, TouchableWithoutFeedback, Linking } from 'react-native';
+import { LayoutAnimation, Platform, UIManager, ScrollView, View, Text, ActivityIndicator, ImageBackground, Modal, TouchableOpacity, TouchableWithoutFeedback, Linking } from 'react-native';
 import { Avatar, ListItem, Image, Badge, Button, Icon, Divider, Header } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { fetchAnime } from '../../redux/ActionCreator'
-import TextTicker from 'react-native-text-ticker'
 import Moment from 'moment'
 
 import Character from './CharacterComponent'
@@ -32,10 +31,26 @@ class Info extends React.PureComponent {
         didFinishInitialAnimation: false
     };
 
+    componentDidMount() {
+        if (Platform.OS === 'android') {
+            UIManager.setLayoutAnimationEnabledExperimental(true);
+        }
+    }
+
     viewAnime = (id) => {
         this.props.navigation.push('Anime', { id })
     }
- 
+
+    expandInfoLayout = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        this.setState({ show_more_info: !this.state.show_more_info });
+    }
+
+    expandSynopsisLayout = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        this.setState({ show_more_synopsis: !this.state.show_more_synopsis });
+    }
+
     render() {
         Moment.locale('en')
         const anime = this.props.anime.anime
@@ -95,13 +110,13 @@ class Info extends React.PureComponent {
                             }
                         })
                     }
-                    <Text onPress={() => this.setState({ show_more_info: !this.state.show_more_info })} style={{fontSize: 14, fontFamily: 'SpaceGrotesk-Bold', textAlign: 'center', textDecorationLine: 'underline', marginBottom: -8, padding: 8}}>Show { this.state.show_more_info ? 'less' : 'more' }</Text>
+                    <Text onPress={() => this.expandInfoLayout() } style={{fontSize: 14, fontFamily: 'SpaceGrotesk-Bold', textAlign: 'center', textDecorationLine: 'underline', marginBottom: -8, padding: 8}}>Show { this.state.show_more_info ? 'less' : 'more' }</Text>
                 </View>
 
                 <View style={{flex: 1, backgroundColor: 'rgba(255,255,255,0.8)', paddingHorizontal: 12, paddingTop: 12, marginVertical: 8, marginBottom: 0, borderRadius: 10}}>
                     <Text style={{fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingBottom: 8}}>Synopsis</Text>
                     <Text numberOfLines={this.state.show_more_synopsis ? null : 4 } onTextLayout={(e) => e.nativeEvent.lines.length > 4 ? this.setState({ set_show_more_synopsis: true }) : null } style={{ textAlign: 'justify', fontSize: 14, fontFamily: 'SpaceGrotesk-Medium', paddingHorizontal: 4}}>{anime.synopsis}</Text>
-                    { this.state.set_show_more_synopsis ? <Text onPress={() => this.setState({ show_more_synopsis: !this.state.show_more_synopsis })} style={{fontSize: 14, fontFamily: 'SpaceGrotesk-Bold', textAlign: 'center', textDecorationLine: 'underline', marginBottom: 4, padding: 8}}>Show { this.state.show_more_synopsis ? 'less' : 'more' }</Text> : null }
+                    { this.state.set_show_more_synopsis ? <Text onPress={() => this.expandSynopsisLayout()} style={{fontSize: 14, fontFamily: 'SpaceGrotesk-Bold', textAlign: 'center', textDecorationLine: 'underline', marginBottom: 4, padding: 8}}>Show { this.state.show_more_synopsis ? 'less' : 'more' }</Text> : null }
                 </View>
 
                 <Character id={this.props.id} navigation={this.props.navigation} />

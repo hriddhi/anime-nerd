@@ -10,6 +10,7 @@ const Anime = produce((
                 draft[action.payload] = {
                     id: action.payload,
                     isLoading: true,
+                    err: null,
                     anime: null,
                     loadingSongs: false,
                     songErr: false,
