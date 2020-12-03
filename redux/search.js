@@ -7,6 +7,7 @@ const Search = produce((
         err: null,
         visible: false,
         result: [],
+        previous_search: [],
         search: ''
     }, action) => {
         switch(action.type){
@@ -22,6 +23,14 @@ const Search = produce((
                 else
                     draft.visible = false
                 return;
+
+            case ActionTypes.ADD_PREVIOUS_SEARCH:
+                draft.previous_search.push(action.payload)
+                return
+
+            case ActionTypes.CLEAR_PREVIOUS_SEARCH:
+                draft.previous_search = []
+                return
 
             default:
                 return draft;

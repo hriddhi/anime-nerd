@@ -56,8 +56,8 @@ class Info extends React.PureComponent {
         const anime = this.props.anime.anime
 
         var info = {
-            'Episodes': anime.num_episodes,
-            'Rank': `#${anime.rank}`,
+            'Episodes': anime.num_episodes ? anime.num_episodes : 'NA',
+            'Rank': anime.rank ? `#${anime.rank}` : 'NA',
             'Popularity': `#${anime.popularity}`,
             'Score': anime.mean,
             'Type': anime.media_type,
@@ -67,7 +67,7 @@ class Info extends React.PureComponent {
             'Start date': anime.aired.split(' to ')[0],
             'End date': anime.aired.split(' to ')[1],
             'Source': anime.source,
-            'Studio': anime.studios ? anime.studios[0].name + (anime.studios[1] ? ', ' + anime.studios[1].name : null ) : ' - ',
+            'Studio': anime.studios ? anime.studios[0].name + (anime.studios[1] ? ', ' + anime.studios[1].name : '' ) : ' - ',
             'Season': anime.premiered
         }
 
@@ -78,7 +78,7 @@ class Info extends React.PureComponent {
                     <View style={{flex: 1, paddingHorizontal: 8, paddingVertical: 4}}>
                         <Text numberOfLines={2} style={{ fontFamily: 'SpaceGrotesk-Bold', fontSize: 18 }}>{anime.title}</Text>
                         <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Medium', fontSize: 10, marginTop: 0 }}>{anime.title_japanese}</Text>
-                        <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Medium', fontSize: 10, marginTop: 0 }}>{anime.title_english}</Text>
+                        { anime.title_english ? <Text numberOfLines={1} style={{ fontFamily: 'SpaceGrotesk-Medium', fontSize: 10, marginTop: 0 }}>{anime.title_english}</Text> : null}
                         <View style={{flexDirection: 'row', flexWrap: 'wrap', marginTop: 4}}>
                             {
                                 anime.genres.map((val,i) => <Text key={i} style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 50}}>{val.name}</Text> )
@@ -113,10 +113,10 @@ class Info extends React.PureComponent {
                     <Text onPress={() => this.expandInfoLayout() } style={{fontSize: 14, fontFamily: 'SpaceGrotesk-Bold', textAlign: 'center', textDecorationLine: 'underline', marginBottom: -8, padding: 8}}>Show { this.state.show_more_info ? 'less' : 'more' }</Text>
                 </View>
 
-                <View style={{flex: 1, backgroundColor: 'rgba(255,255,255,0.8)', paddingHorizontal: 12, paddingTop: 12, marginVertical: 8, marginBottom: 0, borderRadius: 10}}>
+                <View style={{flex: 1, backgroundColor: 'rgba(255,255,255,0.8)', paddingHorizontal: 12, paddingVertical: 12, marginVertical: 8, marginBottom: 0, borderRadius: 10}}>
                     <Text style={{fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingBottom: 8}}>Synopsis</Text>
                     <Text numberOfLines={this.state.show_more_synopsis ? null : 4 } onTextLayout={(e) => e.nativeEvent.lines.length > 4 ? this.setState({ set_show_more_synopsis: true }) : null } style={{ textAlign: 'justify', fontSize: 14, fontFamily: 'SpaceGrotesk-Medium', paddingHorizontal: 4}}>{anime.synopsis}</Text>
-                    { this.state.set_show_more_synopsis ? <Text onPress={() => this.expandSynopsisLayout()} style={{fontSize: 14, fontFamily: 'SpaceGrotesk-Bold', textAlign: 'center', textDecorationLine: 'underline', marginBottom: 4, padding: 8}}>Show { this.state.show_more_synopsis ? 'less' : 'more' }</Text> : null }
+                    { this.state.set_show_more_synopsis ? <Text onPress={() => this.expandSynopsisLayout()} style={{fontSize: 14, fontFamily: 'SpaceGrotesk-Bold', textAlign: 'center', textDecorationLine: 'underline', paddingTop: 4}}>Show { this.state.show_more_synopsis ? 'less' : 'more' }</Text> : null }
                 </View>
 
                 <Character id={this.props.id} navigation={this.props.navigation} />

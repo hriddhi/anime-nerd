@@ -36,6 +36,11 @@ class List extends React.Component {
         name: 'Theme',
         subtitle: 'Change theme',
         func: () => this.props.navigation.navigate('Theme')
+      },
+      {
+        name: 'Version 0.0.6',
+        subtitle: 'You are using an alpha version of Anime Nerd and may encounter some (un)expected issues',
+        func: null
       }
     ]
 

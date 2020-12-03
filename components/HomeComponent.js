@@ -33,7 +33,6 @@ class Home extends React.Component {
                         rightContainerStyle={{ paddingHorizontal: 8 }}
                         containerStyle={{ backgroundColor: 'transparent', borderBottomWidth: 0 }}
                     />
-                    <Text style={{ color: 'yellow', fontFamily: 'SpaceGrotesk-Bold', textAlign: 'center', fontSize: 10 }}>You are using an alpha version of Anime Nerd & may encounter some (un)expected issues</Text>
                     <Tab.Navigator backBehavior="none" lazy 
                         sceneContainerStyle={{backgroundColor: 'transparent'}} 
                         style={{ backgroundColor: 'transparent' }} 

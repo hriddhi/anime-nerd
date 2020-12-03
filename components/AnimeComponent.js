@@ -10,6 +10,7 @@ import Animated from 'react-native-reanimated';
 import Episode from './anime/EpisodeComponent'
 import Info from './anime/InfoComponent'
 import Stats from './anime/StatsComponent'
+import Review from './anime/ReviewComponent'
 
 const mapStateToProps = (state, props) => ({
     anime: state.anime[props.route.params.id],
@@ -272,11 +273,7 @@ class Anime extends React.PureComponent {
                                 {() => <Stats id={this.props.route.params.id} />}
                             </Tab.Screen>
                             <Tab.Screen name='reviews' options={{ title: 'REVIEWS' }}>
-                                {() => (
-                                    <View style={{ flex: 1, justifyContent: 'center' }}>
-                                        <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#fff', fontSize: 16, alignSelf: 'center' }}>Gomen nasai! Under Construction</Text>
-                                    </View>
-                                )}
+                                {() => <Review id={this.props.route.params.id} navigation={this.props.navigation} />}
                             </Tab.Screen>
                         </Tab.Navigator> 
                     </LinearGradient>

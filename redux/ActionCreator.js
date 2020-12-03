@@ -12,15 +12,11 @@ export const logout = () => ({
 
 // ---------------------------------------------------
 
-export const updateSearch = (str, token) => (dispatch) => {
+export const updateSearch = (str) => (dispatch) => {
     dispatch(updateSearchLoading())
-    axios.get(`https://api.myanimelist.net/v2/anime?q=${str}&fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics`, {
-        headers: {
-            'Authorization': 'Bearer ' + token
-        }
-    })
+    axios.get(`https://api.jikan.moe/v3/search/anime?q=${str}&limit=10`)
     .then(response => {
-        dispatch(updateSearchSuccess(response.data.data))
+        dispatch(updateSearchSuccess(response.data.results))
     })
     .catch(err => {
         console.error(err.message)
@@ -36,15 +32,25 @@ export const updateSearchSuccess = (res) => ({
     payload: res
 })
 
+export const addPreviousSearch = (search) => ({
+    type: ActionTypes.ADD_PREVIOUS_SEARCH,
+    payload: search
+})
+
+export const clearPreviousSearch = () => ({
+    type: ActionTypes.CLEAR_PREVIOUS_SEARCH
+})
+
 // ---------------------------------------
 
 export const fetchAnime = (id, token) => (dispatch) => {
 
     dispatch(fetchAnimeLoading(id))
-
+    console.log(id)
     axios.get(`https://api.jikan.moe/v3/anime/${id}`)
     .then((res) => {
         dispatch(fetchAnimeSuccess(res.data))
+        console.log(res.data)
     })
     .catch((err) => {
         console.error(err.message)
@@ -80,7 +86,7 @@ export const fetchAnimeSuccess = (data) => ({
         "premiered": data.premiered,
         "related": data.related,
         "producers": data.producers,
-        "studios": data.producers,
+        "studios": data.studios,
         "genres": data.genres,
         "opening_themes": data.opening_themes,
         "ending_themes": data.ending_themes
@@ -503,4 +509,28 @@ export const fetchAnimeStatsLoading = (id) => ({
 export const fetchAnimeStatsSuccess = (id, data) => ({
     type: ActionTypes.FETCH_ANIME_STATS_SUCCESS,
     payload: { id, stats: data }
+})
+
+// ------------------
+
+export const fetchAnimeReviews = (id) => (dispatch) => {
+
+    dispatch(fetchAnimeReviewsLoading(id))
+    axios.get(`https://api.jikan.moe/v3/anime/${id}/reviews`)
+    .then((res) => {
+        dispatch(fetchAnimeReviewsSuccess(id, res.data))
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
+}
+
+export const fetchAnimeReviewsLoading = (id) => ({
+    type: ActionTypes.FETCH_ANIME_REVIEWS_LOADING,
+    payload: id
+})
+
+export const fetchAnimeReviewsSuccess = (id, data) => ({
+    type: ActionTypes.FETCH_ANIME_REVIEWS_SUCCESS,
+    payload: { reviews: data.reviews, id }
 })

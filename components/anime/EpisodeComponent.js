@@ -49,7 +49,7 @@ class Episode extends React.PureComponent {
                         <View style={{ height: '100%', paddingRight: 16, paddingVertical: 8, flex: 1 }}>
                             <Text numberOfLines={1} style={{ flexShrink: 1, fontSize: 16, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%'}}>{item.title}</Text>
                             <Text style={{ flexShrink: 1, fontSize: 12, fontFamily: 'SpaceGrotesk-Medium', width: '100%'}}>{item.title_japanese}</Text>
-                            <Text style={{ marginTop: 8, flexShrink: 1, fontSize: 12, fontFamily: 'SpaceGrotesk-Medium', width: '100%'}}>{ 'Aired On: ' + (item.aired ? Moment(item.aired).format('LLL') : 'Not Available') }</Text>
+                            <Text style={{ marginTop: 8, flexShrink: 1, fontSize: 12, fontFamily: 'SpaceGrotesk-Medium', width: '100%'}}>{ 'Aired On: ' + (item.aired ? Moment(item.aired).format('lll') : 'Not Available') }</Text>
                         </View>
                     </ListItem>
                     </TouchableOpacity>

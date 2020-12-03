@@ -11,13 +11,14 @@ import Episode from './episode'
 import List from './list'
 import MAL from './mal'
 import Stats from './stats'
+import Reviews from './reviews'
 import { persistStore, persistReducer } from 'redux-persist'
 
 const persistConfig = {
     key: 'session',
     storage: AsyncStorage,
-    whitelist: ['auth'],
-    blacklist: ['anime','search']
+    whitelist: ['auth','search'],
+    blacklist: ['anime']
 };
 
 const store = createStore(
@@ -32,7 +33,8 @@ const store = createStore(
             recommendation: Recommendation,
             episode: Episode,
             mal: MAL,
-            stats: Stats
+            stats: Stats,
+            reviews: Reviews
         })
     ),
     applyMiddleware(thunk)

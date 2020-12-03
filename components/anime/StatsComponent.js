@@ -5,7 +5,10 @@ import { connect } from 'react-redux';
 import { fetchAnimeStats } from '../../redux/ActionCreator'
 
 const mapStateToProps = (state,props) => ({
-    stats: state.stats[props.id]
+    stats: state.stats[props.id],
+    score: state.anime[props.id].anime.mean,
+    popularity: state.anime[props.id].anime.popularity,
+    rank: state.anime[props.id].anime.rank
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -78,10 +81,27 @@ class Stats extends React.PureComponent {
                 data_bar.push({ x: i, y: stats.scores[i].votes })
             }
 
-            console.log(((Dimensions.get('window').width - 16)/3)*2)
             return (
-                <ScrollView>
-                    <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.8)', margin :8, height: 260, borderRadius: 10, overflow: 'hidden' }}>
+                <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 8 }}>
+                    <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.8)', marginBottom: 8, borderRadius: 10, overflow: 'hidden' }}>
+                        <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center', borderRightWidth: 1, borderColor: '#b0b0b0a0' }} >
+                            <Text style={{fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>SCORE</Text>
+                            <Text style={{fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>{this.props.score}</Text>
+                        </View>
+                        <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center', borderRightWidth: 1, borderColor: '#b0b0b0a0' }} >
+                            <Text style={{fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>RANK</Text>
+                            <Text style={{fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>#{this.props.rank}</Text>
+                        </View>
+                        <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center', borderRightWidth: 1, borderColor: '#b0b0b0a0' }} >
+                            <Text style={{fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>POPULARITY</Text>
+                            <Text style={{fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>#{this.props.popularity}</Text>
+                        </View>
+                        <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center' }} >
+                            <Text style={{fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>TOTAL</Text>
+                            <Text style={{fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>{stats.total}</Text>
+                        </View>
+                    </View>
+                    <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.8)', marginBottom: 8, height: 260, borderRadius: 10, overflow: 'hidden' }}>
                         <Text style={{fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', position: 'absolute', top: 8, left: 12}}>Summary Stats</Text>
                         <View style={{ flex: 1, flexGrow: 1, justifyContent: 'center', alignItems: 'flex-end' }}>
                             {
@@ -107,7 +127,7 @@ class Stats extends React.PureComponent {
                             />
                         </View>
                     </View>
-                    <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.8)', margin :8, height: 340, borderRadius: 10, overflow: 'hidden' }}>
+                    <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.8)', height: 340, borderRadius: 10, overflow: 'hidden' }}>
                         <Text style={{fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingTop: 8, paddingLeft: 12 }}>Rating Stats</Text>
                         <VictoryBar
                             barRatio={1}
