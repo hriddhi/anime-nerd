@@ -10,7 +10,8 @@ const mapStateToProps = state => ({
     auth: state.auth,
     list: state.list,
     token: state.auth.access_token,
-    anime: state.anime
+    anime: state.anime,
+    theme: state.options.ui
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -71,21 +72,21 @@ class List extends React.Component {
               <FlatList data={data.data} onRefresh={this.onRefresh} refreshing={(Boolean)(this.props.list.isLoading[this.props.type] && this.props.list[this.props.type])} 
                 renderItem={({ item }) => (
                 <TouchableOpacity key={item.node.id} activeOpacity={0.7} onPress={()=>this.viewAnime(item.node.id)}>
-                  <ListItem key={item.node.id} containerStyle={{height: 120, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.7)', overflow: 'hidden' }}>
+                  <ListItem key={item.node.id} containerStyle={{height: 120, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: this.props.theme[this.props.theme.current].home.card, overflow: 'hidden' }}>
                     <Image source={{ uri: item.node.main_picture.medium }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ width: 85, height: '100%'  }} />
                     <View style={{ height: '100%', paddingRight: 16, paddingVertical: 8, flex: 1 }}>
-                      <Text style={{ flexShrink: 1, fontSize: 16, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%'}}>{item.node.title}</Text>
+                      <Text style={{ flexShrink: 1, fontSize: 16, color: this.props.theme[this.props.theme.current].home.text, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%'}}>{item.node.title}</Text>
                       <View style={{flex: 1, justifyContent: 'flex-end'}}>
                         <View style={{flex: 1, justifyContent: 'flex-end'}}>
                           <View style={{flexDirection: 'row'}}>
                             <View style={{flex: 1, flexDirection: 'column'}}>
-                              <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', paddingBottom: 4, fontSize: 12}}>{item.node.my_list_status.num_episodes_watched +  ' / ' + item.node.num_episodes}</Text>
+                              <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', color: this.props.theme[this.props.theme.current].home.text, paddingBottom: 4, fontSize: 12}}>{item.node.my_list_status.num_episodes_watched +  ' / ' + item.node.num_episodes}</Text>
                             </View>
                             <View style={{flexDirection: 'column-reverse'}}>
-                              <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', paddingBottom: 4, fontSize: 12}}>{item.node.my_list_status.score} <Icon name='star' type='font-awesome' color='#000' size={10}/></Text>
+                              <Text style={{fontFamily: 'SpaceGrotesk-SemiBold', color: this.props.theme[this.props.theme.current].home.text, paddingBottom: 4, fontSize: 12}}>{item.node.my_list_status.score} <Icon name='star' type='font-awesome' color={this.props.theme[this.props.theme.current].home.text} size={10}/></Text>
                             </View>
                           </View>
-                          <Progress.Bar width={null} progress={item.node.my_list_status.num_episodes_watched / item.node.num_episodes} borderColor='rgba(0,0,0,0.6)' color='rgba(0,0,0,0.4)' />
+                          <Progress.Bar width={null} progress={item.node.my_list_status.num_episodes_watched / item.node.num_episodes} borderColor={`rgba(${this.props.theme[this.props.theme.current].home.progress},0.6)`} color={`rgba(${this.props.theme[this.props.theme.current].home.progress},0.4)`} />
                         </View>
                       </View>
                     </View>

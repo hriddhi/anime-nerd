@@ -15,6 +15,7 @@ import Review from './anime/ReviewComponent'
 const mapStateToProps = (state, props) => ({
     anime: state.anime[props.route.params.id],
     access_token: state.auth.access_token,
+    theme: state.options.ui
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -128,22 +129,22 @@ class Songs extends React.PureComponent {
     render(){
         return (
             <React.Fragment>
-            <View style={{ flexDirection: 'row', paddingVertical: 4, paddingRight: 8, height: 48, backgroundColor: 'rgba(255,255,255,0.8)', marginHorizontal: 8, marginBottom: 4, borderRadius: 10 }}>
+            <View style={{ flexDirection: 'row', paddingVertical: 4, paddingRight: 8, height: 48, backgroundColor: this.props.theme[this.props.theme.current].anime.card, marginHorizontal: 8, marginBottom: 4, borderRadius: 10 }}>
                 <Icon name="exclamation-triangle" type='font-awesome' size={28} color="#b0a100" style={{ padding: 8 }} />
-                <Text style={{ flex: 1, fontSize: 14, fontFamily: 'SpaceGrotesk-Medium' }}>Sometimes, songs might not work as intended. Gomen nasai!</Text>
+                <Text style={{ flex: 1, fontSize: 14, fontFamily: 'SpaceGrotesk-Medium', color: this.props.theme[this.props.theme.current].anime.text }}>Sometimes, songs might not work as intended. Gomen nasai!</Text>
             </View>
             <FlatList data={this.state.songs} 
                 renderItem={({ item, index }) => (
-                    <LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} style={{flex: 1, borderRadius: 10, marginVertical: 3, marginHorizontal: 8}} colors={['rgba(255,255,255,0.9)', '#009129']}>
-                        <ListItem key={index} containerStyle={{height: 70, padding: 0, backgroundColor: 'rgba(0,0,0,0.2)', overflow: 'hidden' }}>
-                            <View style={{ backgroundColor: 'rgba(255,255,255,0)', width: 70, height: '100%', display: 'flex', justifyContent: "center", alignItems: "center" }}>
-                                <Text style={{ fontSize: 22, fontFamily: 'SpaceGrotesk-SemiBold' }}>#{index + 1}</Text>
+                    
+                        <ListItem key={index} containerStyle={{height: 70, marginHorizontal: 8, marginVertical: 4, padding: 0, backgroundColor: this.props.theme[this.props.theme.current].anime.card, overflow: 'hidden', borderRadius: 10 }}>
+                            <View style={{ backgroundColor: 'rgba(0,0,0,0.3)', width: 70, height: '100%', display: 'flex', justifyContent: "center", alignItems: "center" }}>
+                                <Text style={{ fontSize: 22, fontFamily: 'SpaceGrotesk-SemiBold', color: this.props.theme[this.props.theme.current].anime.text }}>#{index + 1}</Text>
                             </View>
                             <View style={{ height: '100%', paddingRight: 16, paddingVertical: 8, flex: 1 }}>
-                                <Text numberOfLines={1} style={{ flexShrink: 1,  fontSize: 16, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%'}}>{item.name}</Text>
+                                <Text numberOfLines={1} style={{ flexShrink: 1,  fontSize: 16, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%', color: this.props.theme[this.props.theme.current].anime.text }}>{item.name}</Text>
                                 <View style={{ flex: 1, flexDirection: 'row', marginTop: 9 }}>
-                                    <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 50}}>{item.tag.toUpperCase()}</Text>
-                                    { item.ep ? <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 50}}>{item.ep}</Text> : null }
+                                    <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: this.props.theme[this.props.theme.current].anime.card, color: this.props.theme[this.props.theme.current].anime.text, borderRadius: 50}}>{item.tag.toUpperCase()}</Text>
+                                    { item.ep ? <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: this.props.theme[this.props.theme.current].anime.card, color: this.props.theme[this.props.theme.current].anime.text, borderRadius: 50}}>{item.ep}</Text> : null }
                                 </View>
                             </View> 
                             <Tooltip popover={
@@ -178,12 +179,12 @@ class Songs extends React.PureComponent {
                                 width={194}
                                 containerStyle={{ margin: 4, height: 64, padding: 0, borderRadius: 32 }}
                             >
-                                <View style={{ borderRadius: 20, borderWidth: 4, backgroundColor: 'rgba(0,0,0,0.3)', borderColor: 'rgba(0,0,0,0.8)', height: 40, width: 40, justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
-                                    <Icon name="play" type='font-awesome' size={18} color="rgba(0,171,122,0.8)" style={{ marginLeft: 2 }} />
+                                <View style={{ borderRadius: 20, borderWidth: 4, backgroundColor: 'rgba(0,0,0,0.3)', borderColor: 'rgb(0,0,0)', height: 40, width: 40, justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                                    <Icon name="play" type='font-awesome-5' size={16} color={this.props.theme[this.props.theme.current].anime.text} style={{ marginLeft: 2 }} />
                                 </View>
                             </Tooltip>
                         </ListItem>
-                    </LinearGradient>
+                    
                 )}
                 keyExtractor={(item, index) => index.toString()} 
                 ListEmptyComponent={
@@ -238,11 +239,11 @@ class Anime extends React.PureComponent {
     render() {
             return (
                 <ImageBackground source={{ uri: this.props.anime && this.props.anime.anime !== null ? this.props.anime.anime.image_url ? this.props.anime.anime.image_url : null : null }} style={styles.image}>
-                    <LinearGradient style={{flex: 1}} colors={['rgba(0,0,0,0.1)', '#17009ca0','#5c007a']}>
+                    <LinearGradient style={{flex: 1}} colors={['rgba(0,0,0,0.1)'].concat(this.props.theme[this.props.theme.current].anime.linear_background)}>
                         <Header
-                            leftComponent={<Icon name="arrow-left" type='font-awesome' size={20} color="white" style={{ padding: 16 }} onPress={()=>this.props.navigation.pop()} />}
+                            leftComponent={<Icon name="arrow-left" type='font-awesome' size={20} color={this.props.theme[this.props.theme.current].anime.header_text_color} style={{ padding: 16 }} onPress={()=>this.props.navigation.pop()} />}
                             leftContainerStyle={{ paddingHorizontal: 8 }}
-                            centerComponent={<Text style={{ color: '#fff', textAlign: 'left', fontFamily: 'SpaceGrotesk-Bold', fontSize: 20 }}>ANIME</Text>}
+                            centerComponent={<Text style={{ color: this.props.theme[this.props.theme.current].anime.header_text_color, textAlign: 'left', fontFamily: 'SpaceGrotesk-Bold', fontSize: 20 }}>ANIME</Text>}
                             centerContainerStyle={{ padding: 0, margin: 0 }}
                             containerStyle={{ backgroundColor: 'transparent', borderBottomWidth: 0 }}
                             placement='left'
@@ -268,6 +269,9 @@ class Anime extends React.PureComponent {
                             </Tab.Screen>
                             <Tab.Screen name='songs' options={{ title: 'SONGS' }}>
                                 {() => <Songs {...this.props} />}
+                            </Tab.Screen>
+                            <Tab.Screen name='pictures' options={{ title: 'PICTURES' }}>
+                                {() => <Text>hjgjh</Text>}
                             </Tab.Screen>
                             <Tab.Screen name='stats' options={{ title: 'STATS' }}>
                                 {() => <Stats id={this.props.route.params.id} />}

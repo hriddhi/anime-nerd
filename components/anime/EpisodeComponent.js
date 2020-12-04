@@ -6,7 +6,8 @@ import { fetchAnimeEpisodes } from '../../redux/ActionCreator'
 import Moment from 'moment'
 
 const mapStateToProps = state => ({
-    episode: state.episode
+    episode: state.episode,
+    theme: state.options.ui
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -42,14 +43,14 @@ class Episode extends React.PureComponent {
                 <FlatList data={this.props.episode[this.props.id].episodes} 
                     renderItem={({ item, index }) => (
                     <TouchableOpacity key={index} activeOpacity={0.7} onPress={()=>this.props.navigation.navigate('Web', { uri: item.forum_url })}>
-                    <ListItem key={index} containerStyle={{height: 80, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.8)', overflow: 'hidden' }}>
+                    <ListItem key={index} containerStyle={{height: 80, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: this.props.theme[this.props.theme.current].anime.card, overflow: 'hidden' }}>
                         <View style={{ backgroundColor: 'rgba(0,0,0,0.3)', width: 70, height: '100%', display: 'flex', justifyContent: "center", alignItems: "center" }}>
-                            <Text style={{ fontSize: 22, fontFamily: 'SpaceGrotesk-SemiBold' }}>#{item.episode_id}</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 22, fontFamily: 'SpaceGrotesk-SemiBold' }}>#{item.episode_id}</Text>
                         </View>
                         <View style={{ height: '100%', paddingRight: 16, paddingVertical: 8, flex: 1 }}>
-                            <Text numberOfLines={1} style={{ flexShrink: 1, fontSize: 16, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%'}}>{item.title}</Text>
-                            <Text style={{ flexShrink: 1, fontSize: 12, fontFamily: 'SpaceGrotesk-Medium', width: '100%'}}>{item.title_japanese}</Text>
-                            <Text style={{ marginTop: 8, flexShrink: 1, fontSize: 12, fontFamily: 'SpaceGrotesk-Medium', width: '100%'}}>{ 'Aired On: ' + (item.aired ? Moment(item.aired).format('lll') : 'Not Available') }</Text>
+                            <Text numberOfLines={1} style={{ color: this.props.theme[this.props.theme.current].anime.text, flexShrink: 1, fontSize: 16, fontFamily: 'SpaceGrotesk-SemiBold', width: '100%'}}>{item.title}</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, flexShrink: 1, fontSize: 12, fontFamily: 'SpaceGrotesk-Medium', width: '100%'}}>{item.title_japanese}</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, marginTop: 8, flexShrink: 1, fontSize: 12, fontFamily: 'SpaceGrotesk-Medium', width: '100%'}}>{ 'Aired On: ' + (item.aired ? Moment(item.aired).format('lll') : 'Not Available') }</Text>
                         </View>
                     </ListItem>
                     </TouchableOpacity>

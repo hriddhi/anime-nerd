@@ -14,7 +14,7 @@ export const logout = () => ({
 
 export const updateSearch = (str) => (dispatch) => {
     dispatch(updateSearchLoading())
-    axios.get(`https://api.jikan.moe/v3/search/anime?q=${str}&limit=10`)
+    axios.get(`https://api.jikan.moe/v3/search/anime?q=${str}&limit=10&genre=12&genre_exclude=0`)
     .then(response => {
         dispatch(updateSearchSuccess(response.data.results))
     })
@@ -533,4 +533,11 @@ export const fetchAnimeReviewsLoading = (id) => ({
 export const fetchAnimeReviewsSuccess = (id, data) => ({
     type: ActionTypes.FETCH_ANIME_REVIEWS_SUCCESS,
     payload: { reviews: data.reviews, id }
+})
+
+// ==============================
+
+export const changeTheme = (theme) => ({
+    type: ActionTypes.CHANGE_THEME,
+    payload: theme
 })

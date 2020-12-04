@@ -23,7 +23,8 @@ const mapStateToProps = state => {
     return {
         search: state.search,
         access_token: state.auth.access_token,
-        list: state.list
+        list: state.list,
+        theme: state.options.ui
     }
 }
 
@@ -35,20 +36,20 @@ const mapDispatchToProps = (dispatch) => ({
 class Tab extends React.Component {
   render() {
     return (
-      
-          <BottomTab.Navigator activeColor='#fff' inactiveColor='grey' barStyle={{ backgroundColor: '#5c007a' }} >
+      //bottom_tab_color
+          <BottomTab.Navigator activeColor={this.props.theme[this.props.theme.current].home.bottom_tab_color} inactiveColor='grey' barStyle={{ backgroundColor: this.props.theme[this.props.theme.current].home.bottom_tab_background }} >
             <BottomTab.Screen name="Home" 
               component={Home}
               options={{ 
                 tabBarLabel: <Text style={{ fontSize: 12, fontFamily: 'SpaceGrotesk-SemiBold' }}>HOME</Text>,
-                tabBarIcon: ({focused}) => <Icon name='home' size={ focused ? 24 : 22 } type='font-awesome' color={ focused ? '#fff' : 'grey' }/>,
+                tabBarIcon: ({focused}) => <Icon name='home' size={ focused ? 24 : 22 } type='font-awesome' color={ focused ? this.props.theme[this.props.theme.current].home.bottom_tab_color : 'grey' }/>,
               }}
             />
             <BottomTab.Screen name="Settings" 
               component={Setting}
               options={{ 
                 tabBarLabel: <Text style={{ fontSize: 12, fontFamily: 'SpaceGrotesk-SemiBold' }}>SETTINGS</Text>,
-                tabBarIcon: ({focused}) => <Icon name='gear' size={ focused ? 24 : 22 } type='font-awesome' color={ focused ? '#fff' : 'grey' }/>
+                tabBarIcon: ({focused}) => <Icon name='gear' size={ focused ? 24 : 22 } type='font-awesome' color={ focused ? this.props.theme[this.props.theme.current].home.bottom_tab_color : 'grey' }/>
               }}
             />
           </BottomTab.Navigator>

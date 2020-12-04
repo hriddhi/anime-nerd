@@ -9,7 +9,8 @@ import Moment from 'moment'
 const mapStateToProps = state => ({
   search: state.search,
   token: state.auth.access_token,
-  anime: state.anime
+  anime: state.anime,
+  theme: state.options.ui
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -59,7 +60,7 @@ class Search extends React.Component {
     render() {
         Moment.locale('en')
         return (
-          <LinearGradient style={{flex: 1}} colors={['#17009c','#5c007a']}>
+          <LinearGradient style={{flex: 1}} colors={this.props.theme[this.props.theme.current].home.linear_background}>
             <Header
               leftContainerStyle={{ display: 'none' }}
               centerComponent={<SearchBar ref={search => this.searchRef = search} round={true} onChangeText={this.updateSearch} value={this.state.search} placeholder='Search Anime' inputStyle={{ fontFamily: 'SpaceGrotesk-Medium' }} platform='android' leftIcon={{ color: '#fff' }} containerStyle={{ backgroundColor: 'transparent' }} showLoading={this.props.search.isLoading} loadingProps={{color: '#000'}} onClear={ () => this.props.updateSearchSuccess([]) } />}
@@ -69,19 +70,19 @@ class Search extends React.Component {
             <FlatList data={this.state.show ? this.props.search.result : []} contentContainerStyle={{ paddingVertical: 4, paddingHorizontal: 8 }} keyboardShouldPersistTaps='handled'
               keyboardDismissMode='on-drag' renderItem={({ item }) => (
               <TouchableOpacity key={item.mal_id} activeOpacity={0.7} onPress={()=>this.viewAnime(item.mal_id, item.title)}>
-                <ListItem containerStyle={{ padding: 0, marginVertical: 4, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.8)', height: 120, overflow: 'hidden' }}>
+                <ListItem containerStyle={{ padding: 0, marginVertical: 4, borderRadius: 10, backgroundColor: this.props.theme[this.props.theme.current].home.card, height: 120, overflow: 'hidden' }}>
                   <Image source={{ uri: item.image_url ? item.image_url : placeholder }} PlaceholderContent={<ActivityIndicator color='#000'/>} style={{ flex: 1, width: 85 }} />
                   <View style={{ flex: 1, height: '100%', paddingRight: 4, paddingVertical: 4 }}>
-                    <Text numberOfLines={2} style={{ flexShrink: 1, fontSize: 14, fontFamily: 'SpaceGrotesk-SemiBold'}}>{item.title}</Text>
+                    <Text numberOfLines={2} style={{ flexShrink: 1, fontSize: 14, color: this.props.theme[this.props.theme.current].home.text, fontFamily: 'SpaceGrotesk-SemiBold'}}>{item.title}</Text>
                     <View style={{flexDirection: 'row', flexWrap: 'wrap' }}>  
-                      <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 50}}>{item.episodes} EPS</Text>
-                      <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 50}}>SCORE {item.score}</Text>
-                      <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 50}}>{item.type.toUpperCase()}</Text>
-                      <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 50}}>{item.rated}</Text>
-                      <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 50}}>{Moment(item.start_date).format('ll').toUpperCase()} - {Moment(item.end_date).format('ll').toUpperCase()}</Text>
+                      <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: this.props.theme[this.props.theme.current].home.card, color: this.props.theme[this.props.theme.current].home.text, borderRadius: 50}}>{item.episodes} EPS</Text>
+                      <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: this.props.theme[this.props.theme.current].home.card, color: this.props.theme[this.props.theme.current].home.text, borderRadius: 50}}>SCORE {item.score}</Text>
+                      <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: this.props.theme[this.props.theme.current].home.card, color: this.props.theme[this.props.theme.current].home.text, borderRadius: 50}}>{item.type.toUpperCase()}</Text>
+                      <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: this.props.theme[this.props.theme.current].home.card, color: this.props.theme[this.props.theme.current].home.text, borderRadius: 50}}>{item.rated}</Text>
+                      <Text style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4, marginVertical: 2, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: this.props.theme[this.props.theme.current].home.card, color: this.props.theme[this.props.theme.current].home.text, borderRadius: 50}}>{Moment(item.start_date).format('ll').toUpperCase()} - {Moment(item.end_date).format('ll').toUpperCase()}</Text>
                     </View>
                     <View style={{flex: 1, justifyContent: 'flex-end'}}>
-                      <Text numberOfLines={2} style={{ fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4 }}>{item.synopsis}</Text>
+                      <Text numberOfLines={2} style={{ color: this.props.theme[this.props.theme.current].home.text, fontSize: 10, fontFamily: 'SpaceGrotesk-Medium', marginRight: 4 }}>{item.synopsis}</Text>
                     </View>
                   </View>
                 </ListItem>

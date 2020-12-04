@@ -8,6 +8,7 @@ import { WheelPicker } from 'react-native-wheel-picker-android'
 const mapStateToProps = (state, props) => ({
     mal: state.mal[props.id],
     access_token: state.auth.access_token,
+    theme: state.options.ui
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -71,6 +72,45 @@ class MAL extends React.PureComponent {
     }
 
     modal_status = (anime) => {
+
+        const styles = StyleSheet.create({
+            buttonText: {
+                color: this.props.theme[this.props.theme.current].anime.text,
+                fontFamily: 'SpaceGrotesk-Bold'
+            },
+            centeredView: {
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+            },
+            modalView: {
+                backgroundColor: this.props.theme[this.props.theme.current].anime.modal_background, 
+                borderRadius: 20,
+                padding: 16,
+                alignItems: 'center',
+                shadowColor: "#000",
+                shadowOffset: {
+                    width: 0,
+                    height: 2
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5
+            },
+            modalHeading: {
+                fontFamily: 'SpaceGrotesk-Bold',
+                marginBottom: 16,
+                fontSize: 18,
+                color: this.props.theme[this.props.theme.current].anime.text, 
+            },
+            modalStatusButtons: {
+                borderColor: this.props.theme[this.props.theme.current].anime.text,
+                borderWidth: 1,
+                borderRadius: 20,
+                width: 180,
+            }
+        });
+
         return (
             <Modal animationType="fade" transparent={true} visible={this.state.modal_status} onRequestClose={this.setmodal_status}>
                 <TouchableOpacity style={styles.centeredView} activeOpacity={1} onPressOut={this.setmodal_status}>
@@ -79,52 +119,57 @@ class MAL extends React.PureComponent {
                             <Text style={styles.modalHeading}>Set your status</Text>
                             <View style={{margin: 4}}>
                             <Button title='Watching' 
+                                disabled={ anime.status === 'watching' ? true: false }
                                 type={ anime.status === 'watching' ? 'solid' : 'outline' } 
                                 titleStyle={styles.buttonText} 
-                                buttonStyle={ anime.status === 'watching' ? styles.modalStatusButtonsActive : styles.modalStatusButtons } 
+                                buttonStyle={ styles.modalStatusButtons } 
                                 onPress={() => this.props.updateAnime(this.props.id, { status : `watching-${this.props.mal.status}` }, this.props.access_token)} 
                                 loading={this.props.mal.isUpdating.status === 'watching' ? true : false} 
-                                loadingProps={{color: '#000'}}
+                                loadingProps={{color: this.props.theme[this.props.theme.current].anime.text}}
                             />
                             </View>
                             <View style={{margin: 4}}>
                             <Button title='Plan to Watch' 
+                                disabled={ anime.status === 'plan_to_watch' ? true: false }
                                 type={ anime.status === 'plan_to_watch' ? 'solid' : 'outline' } 
                                 titleStyle={styles.buttonText} 
-                                buttonStyle={ anime.status === 'plan_to_watch' ? styles.modalStatusButtonsActive : styles.modalStatusButtons } 
+                                buttonStyle={ styles.modalStatusButtons } 
                                 onPress={() => this.props.updateAnime(this.props.id, { status: `plan_to_watch-${this.props.mal.status}` }, this.props.access_token)}
                                 loading={this.props.mal.isUpdating.status === 'plan_to_watch' ? true : false} 
-                                loadingProps={{color: '#000'}}
+                                loadingProps={{color: this.props.theme[this.props.theme.current].anime.text}}
                             />
                             </View>
                             <View style={{margin: 4}}>
                             <Button title='On Hold' 
+                                disabled={ anime.status === 'on_hold' ? true: false }
                                 type={ anime.status === 'on_hold' ? 'solid' : 'outline' } 
                                 titleStyle={styles.buttonText} 
-                                buttonStyle={ anime.status === 'on_hold' ? styles.modalStatusButtonsActive : styles.modalStatusButtons } 
+                                buttonStyle={ styles.modalStatusButtons } 
                                 onPress={()=>this.props.updateAnime(this.props.id, { status: `on_hold-${this.props.mal.status}`}, this.props.access_token)} 
                                 loading={this.props.mal.isUpdating.status === 'on_hold' ? true : false} 
-                                loadingProps={{color: '#000'}}
+                                loadingProps={{color: this.props.theme[this.props.theme.current].anime.text}}
                             />
                             </View>
                             <View style={{margin: 4}}>
                             <Button title='Dropped' 
+                                disabled={ anime.status === 'dropped' ? true: false }
                                 type={ anime.status === 'dropped' ? 'solid' : 'outline' } 
                                 titleStyle={styles.buttonText} 
-                                buttonStyle={ anime.status === 'dropped' ? styles.modalStatusButtonsActive : styles.modalStatusButtons } 
+                                buttonStyle={ styles.modalStatusButtons } 
                                 onPress={()=>this.props.updateAnime(this.props.id, { status: `dropped-${this.props.mal.status}`}, this.props.access_token)} 
                                 loading={this.props.mal.isUpdating.status === 'dropped' ? true : false} 
-                                loadingProps={{color: '#000'}}
+                                loadingProps={{color: this.props.theme[this.props.theme.current].anime.text}}
                             />
                             </View>
                             <View style={{margin: 4}}>
                             <Button title='Completed' 
+                                disabled={ anime.status === 'completed' ? true: false }
                                 type={ anime.status === 'completed' ? 'solid' : 'outline' } 
                                 titleStyle={styles.buttonText} 
-                                buttonStyle={ anime.status === 'completed' ? styles.modalStatusButtonsActive : styles.modalStatusButtons } 
+                                buttonStyle={ styles.modalStatusButtons } 
                                 onPress={()=>this.props.updateAnime(this.props.id, { status: `completed-${this.props.mal.status}`}, this.props.access_token)} 
                                 loading={this.props.mal.isUpdating.status === 'completed' ? true : false} 
-                                loadingProps={{color: '#000'}}
+                                loadingProps={{color: this.props.theme[this.props.theme.current].anime.text}}
                             />
                             </View>
                         </View>
@@ -135,6 +180,27 @@ class MAL extends React.PureComponent {
     }
 
     modal_episode = (anime) => {
+        const styles = StyleSheet.create({
+            centeredView: {
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+            },
+            modalViewEpisodes: {
+                backgroundColor: this.props.theme[this.props.theme.current].anime.modal_background, 
+                borderRadius: 20,
+                padding: 16,
+                alignItems: 'center',
+                elevation: 5
+            },
+            modalHeading: {
+                fontFamily: 'SpaceGrotesk-Bold',
+                marginBottom: 16,
+                fontSize: 18,
+                color: this.props.theme[this.props.theme.current].anime.text, 
+            }
+        });
+
         return (
             <Modal animationType="fade" transparent={true} visible={this.state.modal_episode} onRequestClose={this.setmodal_episode}>
                 <TouchableOpacity style={styles.centeredView} onPressOut={this.setmodal_episode} activeOpacity={1}>
@@ -145,6 +211,8 @@ class MAL extends React.PureComponent {
                                 <WheelPicker 
                                     selectedItemTextFontFamily='SpaceGrotesk-Bold' 
                                     itemTextFontFamily='SpaceGrotesk-SemiBold' 
+                                    indicatorColor={ this.props.theme[this.props.theme.current].anime.text }
+                                    selectedItemTextColor={ this.props.theme[this.props.theme.current].anime.text }
                                     selectedItem={anime.episode} 
                                     data={ [...Array(anime ? anime.total + 1 : 1).keys()].map(String) } 
                                     onItemSelected={ (val) => { if(anime.episode !== val) this.setState({ num_episodes_watched_changed: val }) }} 
@@ -158,6 +226,26 @@ class MAL extends React.PureComponent {
     }
 
     modal_rating = (anime) => {
+        const styles = StyleSheet.create({
+            centeredView: {
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+            },
+            modalViewEpisodes: {
+                backgroundColor: this.props.theme[this.props.theme.current].anime.modal_background, 
+                borderRadius: 20,
+                padding: 16,
+                alignItems: 'center',
+                elevation: 5
+            },
+            modalHeading: {
+                fontFamily: 'SpaceGrotesk-Bold',
+                marginBottom: 16,
+                fontSize: 18,
+                color: this.props.theme[this.props.theme.current].anime.text, 
+            }
+        });
         return (
             <Modal animationType="fade" transparent={true} visible={this.state.modal_rating} onRequestClose={this.setmodal_rating}>
                 <TouchableOpacity style={styles.centeredView} onPressOut={this.setmodal_rating} activeOpacity={1}>
@@ -168,6 +256,8 @@ class MAL extends React.PureComponent {
                                 <WheelPicker
                                     selectedItemTextFontFamily='SpaceGrotesk-Bold' 
                                     itemTextFontFamily='SpaceGrotesk-SemiBold' 
+                                    indicatorColor={ this.props.theme[this.props.theme.current].anime.text }
+                                    selectedItemTextColor={ this.props.theme[this.props.theme.current].anime.text }
                                     selectedItem={anime.rating} 
                                     data={ ['0 Not Rated', '1 Appalling', '2 Horrible', '3 Very Bad', '4 Bad', '5 Average', '6 Fine', '7 Good', '8 Very Good', '9 Great', '10 Masterpiece'] } 
                                     onItemSelected={ (val) => { if(anime.rating !== val) this.setState({ rating_changed : val }) } } 
@@ -184,51 +274,51 @@ class MAL extends React.PureComponent {
         if(this.props.mal && this.props.mal.status){
             return (
                 <React.Fragment>
-                    <View style={{flex: 1, overflow: 'hidden', flexDirection: 'row',  backgroundColor: 'rgba(255,255,255,0.8)', marginBottom: 8, borderRadius: 36 }}>
+                    <View style={{flex: 1, overflow: 'hidden', flexDirection: 'row',  backgroundColor: this.props.theme[this.props.theme.current].anime.card, marginBottom: 8, borderRadius: 36 }}>
                         <View style={{flex: 1, flexGrow: 3}}>
                             <Button title={ this.getStatus() } 
                                 type='outline' 
-                                titleStyle={styles.buttonText} 
+                                titleStyle={{color: this.props.theme[this.props.theme.current].anime.text, fontFamily: 'SpaceGrotesk-Bold'}} 
                                 buttonStyle={{ height: '100%', borderWidth: 0 }} 
                                 onPress={this.setmodal_status}
-                                icon={ <Icon name="angle-down" type='font-awesome' size={18} color="black" style={{ paddingLeft: 8 }}  /> } 
+                                icon={ <Icon name="angle-down" type='font-awesome' size={18} color={this.props.theme[this.props.theme.current].anime.text} style={{ paddingLeft: 8 }}  /> } 
                                 iconRight={true}
                                 loading={this.props.mal.isUpdating.status ? true : false} 
-                                loadingProps={{color: '#000'}}
+                                loadingProps={{color: this.props.theme[this.props.theme.current].anime.text}}
                             />
                         </View>
                         <View style={{ flex: 1, flexGrow: 1.5}}>
                             <Button 
                                 title={this.props.mal.episode === 0 ? '-' : `${this.props.mal.episode}`} 
                                 type='outline' 
-                                titleStyle={styles.buttonText} 
+                                titleStyle={{color: this.props.theme[this.props.theme.current].anime.text, fontFamily: 'SpaceGrotesk-Bold'}}
                                 buttonStyle={{ height: '100%', borderRadius: 0, borderTopWidth: 0, borderBottomWidth: 0, borderColor: 'grey' }}
                                 onPress={this.setmodal_episode}
-                                icon={ <Icon name="eye" type='font-awesome' size={18} color="black" style={{ paddingLeft: 10 }} /> } 
+                                icon={ <Icon name="eye" type='font-awesome' size={18} color={this.props.theme[this.props.theme.current].anime.text} style={{ paddingLeft: 10 }} /> } 
                                 iconRight={true}
                                 loading={this.props.mal.isUpdating.episode !== null ? true : false} 
-                                loadingProps={{color: '#000'}}
+                                loadingProps={{color: this.props.theme[this.props.theme.current].anime.text}}
                             />
                         </View>
                         <View style={{flex: 1, flexGrow: 1.5}}>
                             <Button title={this.props.mal.rating === 0 ? '-' : `${this.props.mal.rating}`} 
                                 type='outline' 
-                                titleStyle={styles.buttonText} 
+                                titleStyle={{color: this.props.theme[this.props.theme.current].anime.text, fontFamily: 'SpaceGrotesk-Bold'}}
                                 buttonStyle={{ height: '100%', borderWidth: 0 }}
-                                icon={ <Icon name="thumbs-up" type='font-awesome' size={18} color="black" style={{ paddingLeft: 10 }} /> } 
+                                icon={ <Icon name="thumbs-up" type='font-awesome' size={18} color={this.props.theme[this.props.theme.current].anime.text} style={{ paddingLeft: 10 }} /> } 
                                 iconRight={true}
                                 loading={this.props.mal.isUpdating.rating !== null ? true : false} 
-                                loadingProps={{color: '#000'}}
+                                loadingProps={{color: this.props.theme[this.props.theme.current].anime.text}}
                                 onPress={this.setmodal_rating}
                             />
                         </View>
                         <View style={{flex: 1, flexGrow: 1.2}}>
-                            <Button icon={<Icon name="trash" type='font-awesome' size={18} color="black"/>} 
+                            <Button icon={<Icon name="trash" type='font-awesome' size={18} color={this.props.theme[this.props.theme.current].anime.text}/>} 
                                 type='outline' 
-                                titleStyle={styles.buttonText}
+                                titleStyle={{color: this.props.theme[this.props.theme.current].anime.text, fontFamily: 'SpaceGrotesk-Bold'}}
                                 buttonStyle={{ height: '100%', borderTopWidth: 0, borderBottomWidth: 0, borderRightWidth: 0, borderColor: 'grey'  }}
                                 loading={this.props.mal.isDeleting ? true : false} 
-                                loadingProps={{color: '#000'}}
+                                loadingProps={{color: this.props.theme[this.props.theme.current].anime.text}}
                                 onPress={()=>this.props.deleteListAnime(this.props.id, this.props.mal.status, this.props.access_token)} 
                             />
                         </View>
@@ -244,13 +334,13 @@ class MAL extends React.PureComponent {
             )
         } else {
             return (
-                <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.8)', marginBottom: 8, borderRadius: 36 }}>
+                <View style={{flex: 1, flexDirection: 'row', backgroundColor: this.props.theme[this.props.theme.current].anime.card, marginBottom: 8, borderRadius: 36 }}>
                     <View style={{flex: 1, flexGrow: 2}}>
                         <Button title='Add to Profile' 
                             type='outline' 
-                            titleStyle={styles.buttonText} 
+                            titleStyle={{ color: this.props.theme[this.props.theme.current].anime.text, fontFamily: 'SpaceGrotesk-Bold' }} 
                             buttonStyle={{ height: '100%', borderWidth: 0 }} 
-                            icon={ <Icon name="plus"  type='font-awesome' size={18} color="black" style={{ paddingRight: 16 }}  /> } 
+                            icon={ <Icon name="plus"  type='font-awesome' size={18} color={this.props.theme[this.props.theme.current].anime.text} style={{ paddingRight: 16 }}  /> } 
                             loading={ !this.props.mal || (this.props.mal.isLoading || this.props.mal.isUpdating.status) ? true : false} 
                             loadingProps={{color: '#000'}}
                             onPress={()=>this.props.updateAnime(this.props.id, { status : `plan_to_watch` }, this.props.access_token)} 
@@ -263,66 +353,3 @@ class MAL extends React.PureComponent {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MAL)
-
-const styles = StyleSheet.create({
-    image: {
-      flex: 1,
-      resizeMode: "cover",
-      justifyContent: "center"
-    },
-    buttonText: {
-        color: '#000',
-        fontFamily: 'SpaceGrotesk-Bold'
-    },
-    centeredView: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    modalView: {
-        backgroundColor: "rgba(255,255,255,0.8)",
-        borderRadius: 20,
-        padding: 16,
-        alignItems: 'center',
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5
-    },
-    modalViewEpisodes: {
-        backgroundColor: "rgba(255,255,255,0.9)",
-        borderRadius: 20,
-        padding: 12,
-        alignItems: 'center',
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5
-    },
-    modalHeading: {
-        fontFamily: 'SpaceGrotesk-Bold',
-        marginBottom: 16,
-        fontSize: 18
-    },
-    modalStatusButtons: {
-        borderColor: '#000',
-        borderWidth: 1,
-        borderRadius: 20,
-        width: 180,
-    },
-    modalStatusButtonsActive: {
-        borderColor: '#000',
-        borderWidth: 1,
-        borderRadius: 20,
-        width: 180,
-        backgroundColor: '#a1a1a1'
-    }
-});

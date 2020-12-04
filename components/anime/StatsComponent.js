@@ -8,7 +8,8 @@ const mapStateToProps = (state,props) => ({
     stats: state.stats[props.id],
     score: state.anime[props.id].anime.mean,
     popularity: state.anime[props.id].anime.popularity,
-    rank: state.anime[props.id].anime.rank
+    rank: state.anime[props.id].anime.rank,
+    theme: state.options.ui
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -83,33 +84,33 @@ class Stats extends React.PureComponent {
 
             return (
                 <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 8 }}>
-                    <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.8)', marginBottom: 8, borderRadius: 10, overflow: 'hidden' }}>
+                    <View style={{ flex: 1, flexDirection: 'row', backgroundColor: this.props.theme[this.props.theme.current].anime.card, marginBottom: 8, borderRadius: 10, overflow: 'hidden' }}>
                         <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center', borderRightWidth: 1, borderColor: '#b0b0b0a0' }} >
-                            <Text style={{fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>SCORE</Text>
-                            <Text style={{fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>{this.props.score}</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>SCORE</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>{this.props.score}</Text>
                         </View>
                         <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center', borderRightWidth: 1, borderColor: '#b0b0b0a0' }} >
-                            <Text style={{fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>RANK</Text>
-                            <Text style={{fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>#{this.props.rank}</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>RANK</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>#{this.props.rank}</Text>
                         </View>
                         <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center', borderRightWidth: 1, borderColor: '#b0b0b0a0' }} >
-                            <Text style={{fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>POPULARITY</Text>
-                            <Text style={{fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>#{this.props.popularity}</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>POPULARITY</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>#{this.props.popularity}</Text>
                         </View>
                         <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center' }} >
-                            <Text style={{fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>TOTAL</Text>
-                            <Text style={{fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>{stats.total}</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>TOTAL</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>{nFormatter(stats.total, 1)}</Text>
                         </View>
                     </View>
-                    <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.8)', marginBottom: 8, height: 260, borderRadius: 10, overflow: 'hidden' }}>
-                        <Text style={{fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', position: 'absolute', top: 8, left: 12}}>Summary Stats</Text>
+                    <View style={{ flex: 1, flexDirection: 'row', backgroundColor: this.props.theme[this.props.theme.current].anime.card, marginBottom: 8, height: 260, borderRadius: 10, overflow: 'hidden' }}>
+                        <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', position: 'absolute', top: 8, left: 12}}>Summary Stats</Text>
                         <View style={{ flex: 1, flexGrow: 1, justifyContent: 'center', alignItems: 'flex-end' }}>
                             {
                                 data.map((val,index) => (
                                     <View key={index} style={{ flexDirection: 'row', height: 30 }}>
-                                        <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', alignSelf: 'center' }}>{val.x}</Text>
+                                        <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontFamily: 'SpaceGrotesk-SemiBold', alignSelf: 'center' }}>{val.x}</Text>
                                         <View style={{ height: 20, width: 40, borderRadius: 10, backgroundColor: val.color, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginLeft: 8 }}>
-                                            <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 12, textAlign: 'center', color: '#fff', marginTop: -1 }}>{Math.round((val.y/stats.total) * 100)}%</Text>
+                                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontFamily: 'SpaceGrotesk-SemiBold', fontSize: 12, textAlign: 'center', color: '#fff', marginTop: -1 }}>{Math.round((val.y/stats.total) * 100)}%</Text>
                                         </View>
                                     </View>
                                 ))
@@ -127,8 +128,8 @@ class Stats extends React.PureComponent {
                             />
                         </View>
                     </View>
-                    <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.8)', height: 340, borderRadius: 10, overflow: 'hidden' }}>
-                        <Text style={{fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingTop: 8, paddingLeft: 12 }}>Rating Stats</Text>
+                    <View style={{ flex: 1, backgroundColor: this.props.theme[this.props.theme.current].anime.card, height: 340, borderRadius: 10, overflow: 'hidden' }}>
+                        <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingTop: 8, paddingLeft: 12 }}>Rating Stats</Text>
                         <VictoryBar
                             barRatio={1}
                             height={300}
@@ -140,7 +141,7 @@ class Stats extends React.PureComponent {
                             origin={{ x: 0, y: 0 }}
                             padding={{ left: 0 , top: 0, bottom: 0, right: 8 }}
                             cornerRadius={{ topLeft: 12, topRight: 12 }}
-                            style={{ labels: { fontFamily: 'SpaceGrotesk-Bold' }, data: { fill: ({ datum }) => bar_color[datum.x - 1] } }}
+                            style={{ labels: { fontFamily: 'SpaceGrotesk-Bold', fill: this.props.theme[this.props.theme.current].anime.text }, data: { fill: ({ datum }) => bar_color[datum.x - 1] } }}
                             labelComponent={<VictoryLabel dx={-21}/>}
                         />
                     </View>

@@ -10,7 +10,8 @@ import LinearGradient from 'react-native-linear-gradient';
 
 const mapStateToProps = state => ({
     auth: state.auth,
-    list: state.list
+    list: state.list,
+    theme: state.options.ui
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -27,16 +28,16 @@ class Home extends React.Component {
             return (
                 <React.Fragment>
                     <Header
-                        leftComponent={<Text style={{ color: '#fff', fontFamily: 'SpaceGrotesk-Bold', fontSize: 20 }}>HOME</Text>}
+                        leftComponent={<Text style={{ color: this.props.theme[this.props.theme.current].home.top_tab_text_color, fontFamily: 'SpaceGrotesk-Bold', fontSize: 20 }}>HOME</Text>}
                         leftContainerStyle={{ paddingHorizontal: 8 }}
-                        rightComponent={<Icon name="search" type='font-awesome' size={20} color="white" style={{ padding: 16 }} onPress={()=>this.props.navigation.navigate('Search')} />}
+                        rightComponent={<Icon name="search" type='font-awesome' size={20} color={this.props.theme[this.props.theme.current].home.top_tab_text_color} style={{ padding: 16 }} onPress={()=>this.props.navigation.navigate('Search')} />}
                         rightContainerStyle={{ paddingHorizontal: 8 }}
                         containerStyle={{ backgroundColor: 'transparent', borderBottomWidth: 0 }}
                     />
                     <Tab.Navigator backBehavior="none" lazy 
                         sceneContainerStyle={{backgroundColor: 'transparent'}} 
                         style={{ backgroundColor: 'transparent' }} 
-                        tabBarOptions={{ indicatorStyle: { borderBottomWidth: 5, borderColor: '#fff' }, scrollEnabled: true, labelStyle: { color: '#fff', fontFamily: 'SpaceGrotesk-SemiBold' }, style: { backgroundColor: 'transparent' } }} 
+                        tabBarOptions={{ indicatorStyle: { borderBottomWidth: 5, borderColor: this.props.theme[this.props.theme.current].home.top_tab_indicator_color }, scrollEnabled: true, labelStyle: { color: this.props.theme[this.props.theme.current].home.top_tab_text_color, fontFamily: 'SpaceGrotesk-SemiBold' }, style: { backgroundColor: 'transparent' } }} 
                     >
                         <Tab.Screen name='watching' options={{ title: this.props.list.watching !== null ? `Watching (${this.props.list.watching.data.length})` : 'Watching' }}>
                             {()=><List type='watching' {...this.props} />}

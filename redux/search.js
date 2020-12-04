@@ -25,7 +25,8 @@ const Search = produce((
                 return;
 
             case ActionTypes.ADD_PREVIOUS_SEARCH:
-                draft.previous_search.push(action.payload)
+                if(!draft.previous_search.includes(action.payload))
+                    draft.previous_search.push(action.payload)
                 return
 
             case ActionTypes.CLEAR_PREVIOUS_SEARCH:
