@@ -1,7 +1,6 @@
 import * as ActionTypes from './ActionTypes';
-import produce from 'immer';
 
-const Options = produce((
+const Options = (
     draft = {
         ui: {
             current: 'default',
@@ -18,7 +17,7 @@ const Options = produce((
                 },
                 anime: {
                     header_text_color: '#fff',
-                    linear_background: ['#17009ca0','#5c007a'],
+                    linear_background: ['#17009c','#5c007a'],
                     card: 'rgba(255,255,255,0.8)',
                     text: 'black',
                     title: 'black',
@@ -49,7 +48,7 @@ const Options = produce((
                     text: '#e0e0e0',
                     title: '#f7f7f7',
                     card_overlay: 'rgba(255,255,255,0.6)',
-                    modal_background: 'rgba(0,0,0,0.7)'
+                    modal_background: '#7a7a7a'
                 },
                 setting: {
                     header_text_color: '#fff',
@@ -102,7 +101,7 @@ const Options = produce((
                     text: '#EEF2F5',
                     title: '#E7DED4',
                     card_overlay: 'rgba(255,255,255,0.6)',
-                    modal_background: 'rgba(0,0,0,0.7)'
+                    modal_background: '#7a7a7a'
                 },
                 setting: {
                     header_text_color: '#fff',
@@ -140,13 +139,18 @@ const Options = produce((
     }, action) => {
         switch(action.type){
             case ActionTypes.CHANGE_THEME:
-                draft.ui.current = action.payload
-                return
+                return {
+                    ...draft,
+                    ui: {
+                        ...draft.ui,
+                        current: action.payload
+                    }
+                }
 
             default:
                 return draft
         }
     }
-)
+
 
 export default Options;

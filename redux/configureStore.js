@@ -13,6 +13,7 @@ import MAL from './mal'
 import Stats from './stats'
 import Reviews from './reviews'
 import Options from './options'
+import Pictures from './picture'
 import { persistStore, persistReducer } from 'redux-persist'
 
 const persistConfig = {
@@ -33,6 +34,7 @@ const store = createStore(
             related: Related,
             recommendation: Recommendation,
             episode: Episode,
+            pictures: Pictures,
             mal: MAL,
             stats: Stats,
             reviews: Reviews,

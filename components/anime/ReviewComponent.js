@@ -4,7 +4,6 @@ import { ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { fetchAnimeReviews } from '../../redux/ActionCreator'
 import Moment from 'moment'
-import { ScrollView } from 'react-native-gesture-handler';
 
 const mapStateToProps = (state,props) => ({
     reviews: state.reviews[props.id],
@@ -64,7 +63,7 @@ class reviews extends React.PureComponent {
                     ref={(ref) => { this.flatListRef = ref }}
                     renderItem={({ item, index }) => (
                         <TouchableOpacity key={index} activeOpacity={0.7} onPress={() => this.expandReview(index) }>
-                            <View key={index} style={{ flex: 1, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: this.props.theme[this.props.theme.current].anime.card }}>
+                            <View key={index} style={{ flex: 1, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: this.props.theme[this.props.theme.current].anime.card, overflow: 'hidden' }}>
                                 <View style={{ flex: 1, paddingVertical: 2, paddingHorizontal: 4, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: 'rgba(0,0,0,0.2)' }}>
                                     <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, flex: 1, flexGrow: 1, fontSize: 10, fontFamily: 'SpaceGrotesk-SemiBold', marginVertical: 2, paddingVertical: 2, textAlign: 'center' }}>ANIMATION {item.reviewer.scores.animation}</Text>
                                     <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, flex: 1, flexGrow: 1, fontSize: 10, fontFamily: 'SpaceGrotesk-SemiBold', marginVertical: 2, paddingVertical: 2, textAlign: 'center' }}>STORY {item.reviewer.scores.story}</Text>

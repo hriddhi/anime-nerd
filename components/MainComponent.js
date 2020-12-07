@@ -1,15 +1,13 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import { StatusBar, View, Text } from 'react-native'
-import { SearchBar, Input, ThemeProvider, Icon } from 'react-native-elements';
-import Setting from './SettingComponent'
+import { StatusBar } from 'react-native'
 import Search from './SearchComponent';
 import Anime from './AnimeComponent'
 import Web from './WebViewComponent'
 import Tab from './TabComponent'
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 import { enableScreens } from 'react-native-screens'
+import { createStackNavigator } from '@react-navigation/stack';
 import { createNativeStackNavigator } from 'react-native-screens/native-stack'
 import SplashScreen from 'react-native-splash-screen'
 import LinearGradient from 'react-native-linear-gradient'
@@ -19,8 +17,7 @@ const mapStateToProps = (state) => ({
   theme: state.options.ui
 })
 
-enableScreens()
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 class Main extends React.Component {
 
@@ -44,10 +41,10 @@ class Main extends React.Component {
       <LinearGradient style={{flex: 1}} colors={this.props.theme[this.props.theme.current].home.linear_background}>
         <NavigationContainer theme={{ colors: { background: 'rgba(0,0,0,0)', labelStyle: { color: '#fff', fontFamily: 'SpaceGrotesk-SemiBold' } } }}>
           <Stack.Navigator>
-            <Stack.Screen name="Tab" component={Tab} options={{ headerShown: false, stackAnimation: 'none' }}/>
-            <Stack.Screen name="Search" component={Search} options={{ headerShown: false, stackAnimation: 'fade' }} />
-            <Stack.Screen name="Anime" component={Anime} options={{ headerShown: false, stackAnimation: 'fade' }} />
-            <Stack.Screen name="Web" component={Web} options={{ headerShown: false, stackAnimation: 'fade' }} />
+            <Stack.Screen name="Tab" component={Tab} options={{ headerShown: false }}/>
+            <Stack.Screen name="Search" component={Search} options={{ headerShown: false }} />
+            <Stack.Screen name="Anime" component={Anime} options={{ headerShown: false }} />
+            <Stack.Screen name="Web" component={Web} options={{ headerShown: false }} />
           </Stack.Navigator>
         </NavigationContainer>
       </LinearGradient>

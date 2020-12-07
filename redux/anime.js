@@ -1,47 +1,68 @@
 import * as ActionTypes from './ActionTypes';
-import produce from 'immer';
 
-const Anime = produce((
+const Anime = (
     draft = {
         
     }, action) => {
         switch(action.type){
             case ActionTypes.FETCH_ANIME_LOADING:
-                draft[action.payload] = {
-                    id: action.payload,
-                    isLoading: true,
-                    err: null,
-                    anime: null,
-                    loadingSongs: false,
-                    songErr: false,
-                    songs:[]
+                return {
+                    ...draft,
+                    [action.payload]: {
+                        id: action.payload,
+                        isLoading: true,
+                        err: null,
+                        anime: null,
+                        loadingSongs: false,
+                        songErr: false,
+                        songs:[]
+                    }
                 }
-                return
 
             case ActionTypes.FETCH_ANIME_SUCCESS:
-                draft[action.payload.id].isLoading = false
-                draft[action.payload.id].anime = action.payload
-                return
+                return {
+                    ...draft,
+                    [action.payload.id]: {
+                        ...action.payload.id,
+                        isLoading: false,
+                        anime: action.payload
+                    }
+                }
 
             case ActionTypes.FETCH_ANIME_SONGS_LOADING:
-                draft[action.payload].loadingSongs = true
-                draft[action.payload].songErr = false
-                return
+                return {
+                    ...draft,
+                    [action.payload]: {
+                        ...action.payload,
+                        loadingSongs: true,
+                        songErr: false
+                    }
+                }
 
             case ActionTypes.FETCH_ANIME_SONGS_ERROR:
-                draft[action.payload].songErr = true
-                return
-
+                return {
+                    ...draft,
+                    [action.payload]: {
+                        ...action.payload,
+                        songErr: true
+                    }
+                }
+ 
             case ActionTypes.FETCH_ANIME_SONGS_SUCCESS:
-                draft[action.payload.id].loadingSongs = false
-                draft[action.payload.id].songErr = false
-                draft[action.payload.id].songs = action.payload.songs
-                return
+                return {
+                    ...draft,
+                    [action.payload.id]: {
+                        ...action.payload.id,
+                        loadingSongs: false,
+                        songErr: false,
+                        songs: action.payload.songs
+                    }
+                }
 
             default:
                 return draft
         }
     }
-)
+
 
 export default Anime;

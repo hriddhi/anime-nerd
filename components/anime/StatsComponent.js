@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, View, Text, ActivityIndicator, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { InteractionManager, View, Text, ActivityIndicator, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { VictoryBar, VictoryLabel, VictoryTheme, VictoryPie, VictoryChart } from "victory-native";
 import { connect } from 'react-redux';
 import { fetchAnimeStats } from '../../redux/ActionCreator'
@@ -51,16 +51,24 @@ function nFormatter(num, digits) {
 
 class Stats extends React.PureComponent {
 
+    state = {
+        interactionDone: false
+    }
+
     componentDidMount() {
-        if(this.props.stats === undefined)
-            this.props.fetchAnimeStats(this.props.id)
+       
+        InteractionManager.runAfterInteractions(() => {
+            if(this.props.stats === undefined)
+                this.props.fetchAnimeStats(this.props.id)       
+            console.log('Interaction done')
+            this.setState({ interactionDone: true })
+        })
+        
     }
 
     render() {
 
-        if(this.props.stats === undefined){
-            return null
-        } else if(this.props.stats && this.props.stats.isLoading){
+        if(this.props.stats === undefined || this.props.stats && this.props.stats.isLoading){
             return (
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <ActivityIndicator size='large' color='#fff'/>

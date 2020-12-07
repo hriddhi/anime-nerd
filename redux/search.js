@@ -1,7 +1,6 @@
 import * as ActionTypes from './ActionTypes';
-import produce from 'immer';
 
-const Search = produce((
+const Search = (
     draft = {
         isLoading: false,
         err: null,
@@ -12,31 +11,30 @@ const Search = produce((
     }, action) => {
         switch(action.type){
             case ActionTypes.UPDATE_SEARCH_LOADING:
-                draft.isLoading = true
-                return
+                return { ...draft, isLoading: true }
 
             case ActionTypes.UPDATE_SEARCH_SUCCESS:
-                draft.isLoading = false
-                draft.result = action.payload;
                 if(action.payload.length > 0)
-                    draft.visible = true
+                    return { ...draft, isLoading: false, result: action.payload, visible: true }
                 else
-                    draft.visible = false
-                return;
+                    return { ...draft, isLoading: false, result: action.payload, visible: false }
 
             case ActionTypes.ADD_PREVIOUS_SEARCH:
-                if(!draft.previous_search.includes(action.payload))
-                    draft.previous_search.push(action.payload)
-                return
+                if(draft.previous_search.findIndex((x) => x.title === action.payload.title) === -1){
+                    var temp = draft.previous_search
+                    temp.push(action.payload)
+                    return { ...draft, previous_search: temp }
+                } else {
+                    return draft
+                }
 
             case ActionTypes.CLEAR_PREVIOUS_SEARCH:
-                draft.previous_search = []
-                return
+                return { ...draft, previous_search: [] }
 
             default:
                 return draft;
         }
     }
-)
+
 
 export default Search;

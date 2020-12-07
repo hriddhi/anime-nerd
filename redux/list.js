@@ -1,7 +1,6 @@
 import * as ActionTypes from './ActionTypes';
-import produce from 'immer';
 
-const List = produce((
+const List = (
     draft = {
         isLoading: {
             watching: false,
@@ -29,65 +28,144 @@ const List = produce((
                 if(draft[action.payload.status] !== null){
                     var i = draft[action.payload.status].data.findIndex((val) => val.node.id === action.payload.id)
                     if(i !== -1){
-                        draft[action.payload.status].data[i].node.my_list_status = action.payload
+                        var temp = draft[action.payload.status].data
+                        temp[i] = {
+                            node: {
+                                ...draft[action.payload.status].data[i].node,
+                                my_list_status: action.payload
+                            }
+                        }
+                        return {
+                            ...draft,
+                            [action.payload.status]: {
+                                ...draft[action.payload.status],
+                                data: [ ...temp ]
+                            }
+                        }
+                    } else {
+                        return draft
                     }
                 }
-                return
-
+ 
             case ActionTypes.FETCH_USER_WATCHING_LOADING:
-                draft.isLoading.watching = true
-                return
+                return {
+                    ...draft,
+                    isLoading: {
+                        ...draft.isLoading,
+                        watching: true
+                    }
+                }
 
             case ActionTypes.FETCH_USER_WATCHING_SUCCESS:
-                draft.isLoading.watching = false
-                draft.watching = action.payload
-                draft.visible.watching = true
-                return
+                return {
+                    ...draft,
+                    isLoading: {
+                        ...draft.isLoading,
+                        watching: false
+                    },
+                    watching: action.payload,
+                    visible: {
+                        ...draft.visible,
+                        watching: true
+                    }
+                }
 
             case ActionTypes.FETCH_USER_PLAN_LOADING:
-                draft.isLoading.plan_to_watch = true
-                return
+                return {
+                    ...draft,
+                    isLoading: {
+                        ...draft.isLoading,
+                        plan_to_watch: true
+                    }
+                }
 
             case ActionTypes.FETCH_USER_PLAN_SUCCESS:
-                draft.isLoading.plan_to_watch = false
-                draft.plan_to_watch = action.payload
-                draft.visible.plan_to_watch = true
-                return
+                return {
+                    ...draft,
+                    isLoading: {
+                        ...draft.isLoading,
+                        plan_to_watch: false
+                    },
+                    plan_to_watch: action.payload,
+                    visible: {
+                        ...draft.visible,
+                        plan_to_watch: true
+                    }
+                }
 
             case ActionTypes.FETCH_USER_HOLD_LOADING:
-                draft.isLoading.on_hold = true
-                return
+                return {
+                    ...draft,
+                    isLoading: {
+                        ...draft.isLoading,
+                        on_hold: true
+                    }
+                }
 
             case ActionTypes.FETCH_USER_HOLD_SUCCESS:
-                draft.isLoading.on_hold = false
-                draft.on_hold = action.payload
-                draft.visible.on_hold = true
-                return
+                return {
+                    ...draft,
+                    isLoading: {
+                        ...draft.isLoading,
+                        on_hold: false
+                    },
+                    on_hold: action.payload,
+                    visible: {
+                        ...draft.visible,
+                        on_hold: true
+                    }
+                }
 
             case ActionTypes.FETCH_USER_DROPPED_LOADING:
-                draft.isLoading.dropped = true
-                return
+                return {
+                    ...draft,
+                    isLoading: {
+                        ...draft.isLoading,
+                        dropped: true
+                    }
+                }
 
             case ActionTypes.FETCH_USER_DROPPED_SUCCESS:
-                draft.isLoading.dropped = false
-                draft.dropped = action.payload
-                draft.visible.dropped = true
-                return
+                return {
+                    ...draft,
+                    isLoading: {
+                        ...draft.isLoading,
+                        dropped: false
+                    },
+                    dropped: action.payload,
+                    visible: {
+                        ...draft.visible,
+                        dropped: true
+                    }
+                }
 
             case ActionTypes.FETCH_USER_COMPLETED_LOADING:
-                draft.isLoading.completed = true
-                return
+                return {
+                    ...draft,
+                    isLoading: {
+                        ...draft.isLoading,
+                        completed: true
+                    }
+                }
 
             case ActionTypes.FETCH_USER_COMPLETED_SUCCESS:
-                draft.isLoading.completed = false
-                draft.completed = action.payload
-                draft.visible.completed = true
-                return
+                return {
+                    ...draft,
+                    isLoading: {
+                        ...draft.isLoading,
+                        completed: false
+                    },
+                    completed: action.payload,
+                    visible: {
+                        ...draft.visible,
+                        completed: true
+                    }
+                }
 
             default:
                 return draft;
         }
     }
-)
+
 
 export default List;

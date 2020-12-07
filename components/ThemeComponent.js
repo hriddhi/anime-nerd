@@ -24,8 +24,8 @@ class Theme extends React.Component {
             <ListItem.Title style={{ fontFamily: 'SpaceGrotesk-Bold', paddingHorizontal: 16, paddingBottom: 8 }}>Choose Theme</ListItem.Title>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {
-                themes.map(val => (
-                  <View style={{ flex: 1, flexDirection: 'row' }}>
+                themes.map((val,i) => (
+                  <View key={i} style={{ flex: 1, flexDirection: 'row' }}>
                     <View style={{ flex: 1, width: 100, justifyContent: 'center', alignItems: 'center' }}>
                       <View style={{ padding: 2, borderRadius: 33, borderWidth: 3, borderColor: this.props.theme.current === val ? '#000' : 'transparent' }}>
                         <TouchableOpacity onPress={() => this.props.changeTheme(val)} style={{ borderRadius: 25, overflow: 'hidden' }}>

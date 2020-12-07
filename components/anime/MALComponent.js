@@ -40,8 +40,9 @@ class MAL extends React.PureComponent {
         this.setState({ modal_episode: !this.state.modal_episode });
         if(this.props.mal && this.state.num_episodes_watched_changed !== false)
             this.props.updateAnime(this.props.id, { episode: this.state.num_episodes_watched_changed }, this.props.access_token)
-        if(this.props.mal.episode && this.state.num_episodes_watched_changed !== false && this.props.mal.episode === 0)
-            this.props.updateAnime(this.props.mal.id, { status: `watching-${this.props.mal.status}`, episode: this.state.num_episodes_watched_changed }, this.props.access_token)
+        if(this.props.mal && this.state.num_episodes_watched_changed !== false && this.props.mal.episode === 0){
+            this.props.updateAnime(this.props.id, { status: `watching-${this.props.mal.status}`, episode: this.state.num_episodes_watched_changed }, this.props.access_token)
+        }
         if(this.props.mal.episode && this.state.num_episodes_watched_changed !== false && this.state.num_episodes_watched_changed === this.props.mal.total)
             this.props.updateAnime(this.props.id, { status: `completed-${this.props.mal.status}`, episode: this.state.num_episodes_watched_changed }, this.props.access_token)
         if(this.state.num_episodes_watched_changed !== false)
@@ -50,7 +51,6 @@ class MAL extends React.PureComponent {
 
     setmodal_rating = () => {
         this.setState({ modal_rating: !this.state.modal_rating });
-        console.log(this.state.rating_changed)
         if(this.props.mal && this.state.rating_changed !== false)
             this.props.updateAnime(this.props.id, { rating: this.state.rating_changed }, this.props.access_token)
         if(this.state.rating_changed !== false)
@@ -209,10 +209,12 @@ class MAL extends React.PureComponent {
                             <Text style={styles.modalHeading}>Set Ep Watched</Text>
                             <View>
                                 <WheelPicker 
+                                    
                                     selectedItemTextFontFamily='SpaceGrotesk-Bold' 
                                     itemTextFontFamily='SpaceGrotesk-SemiBold' 
-                                    indicatorColor={ this.props.theme[this.props.theme.current].anime.text }
-                                    selectedItemTextColor={ this.props.theme[this.props.theme.current].anime.text }
+                                    
+                                    
+                                    
                                     selectedItem={anime.episode} 
                                     data={ [...Array(anime ? anime.total + 1 : 1).keys()].map(String) } 
                                     onItemSelected={ (val) => { if(anime.episode !== val) this.setState({ num_episodes_watched_changed: val }) }} 
@@ -235,8 +237,15 @@ class MAL extends React.PureComponent {
             modalViewEpisodes: {
                 backgroundColor: this.props.theme[this.props.theme.current].anime.modal_background, 
                 borderRadius: 20,
-                padding: 16,
+                padding: 12,
                 alignItems: 'center',
+                shadowColor: "#000",
+                shadowOffset: {
+                    width: 0,
+                    height: 2
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
                 elevation: 5
             },
             modalHeading: {
@@ -256,9 +265,7 @@ class MAL extends React.PureComponent {
                                 <WheelPicker
                                     selectedItemTextFontFamily='SpaceGrotesk-Bold' 
                                     itemTextFontFamily='SpaceGrotesk-SemiBold' 
-                                    indicatorColor={ this.props.theme[this.props.theme.current].anime.text }
-                                    selectedItemTextColor={ this.props.theme[this.props.theme.current].anime.text }
-                                    selectedItem={anime.rating} 
+                                    selectedItem={anime.rating}
                                     data={ ['0 Not Rated', '1 Appalling', '2 Horrible', '3 Very Bad', '4 Bad', '5 Average', '6 Fine', '7 Good', '8 Very Good', '9 Great', '10 Masterpiece'] } 
                                     onItemSelected={ (val) => { if(anime.rating !== val) this.setState({ rating_changed : val }) } } 
                                 />
@@ -271,6 +278,9 @@ class MAL extends React.PureComponent {
     }
 
     render() {
+
+        console.log(this.props.mal)
+
         if(this.props.mal && this.props.mal.status){
             return (
                 <React.Fragment>

@@ -1,26 +1,24 @@
 import * as ActionTypes from './ActionTypes';
 
-const Episode = (
-    draft = {
-        
-    }, action) => {
+const Pictures = (
+    draft = { }, action) => {
         switch(action.type){
-            case ActionTypes.FETCH_ANIME_STATS_LOADING:
+            case ActionTypes.FETCH_ANIME_PICTURE_LOADING:
                 return {
                     ...draft,
                     [action.payload]: {
                         isLoading: true,
-                        stats: null,
+                        pictures: null,
                         err: false
                     }
                 }
 
-            case ActionTypes.FETCH_ANIME_STATS_SUCCESS:
+            case ActionTypes.FETCH_ANIME_PICTURE_SUCCESS:
                 return {
                     ...draft,
                     [action.payload.id]: {
                         isLoading: false,
-                        stats: action.payload.stats,
+                        pictures: action.payload.pictures,
                         err: false
                     }
                 }
@@ -28,7 +26,7 @@ const Episode = (
             default:
                 return draft
         }
-    }
+}
 
 
-export default Episode;
+export default Pictures;

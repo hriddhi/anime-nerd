@@ -67,7 +67,7 @@ class Search extends React.Component {
               rightContainerStyle={{ display: 'none' }}
               containerStyle={{ backgroundColor: 'rgba(255,255,255,0.8)', borderBottomWidth: 0 }}
             />
-            <FlatList data={this.state.show ? this.props.search.result : []} contentContainerStyle={{ paddingVertical: 4, paddingHorizontal: 8 }} keyboardShouldPersistTaps='handled'
+            <FlatList data={this.state.show ? this.props.search.result.filter((val) => val.rated !== 'Rx' ) : []} contentContainerStyle={{ paddingVertical: 4, paddingHorizontal: 8 }} keyboardShouldPersistTaps='handled'
               keyboardDismissMode='on-drag' renderItem={({ item }) => (
               <TouchableOpacity key={item.mal_id} activeOpacity={0.7} onPress={()=>this.viewAnime(item.mal_id, item.title)}>
                 <ListItem containerStyle={{ padding: 0, marginVertical: 4, borderRadius: 10, backgroundColor: this.props.theme[this.props.theme.current].home.card, height: 120, overflow: 'hidden' }}>

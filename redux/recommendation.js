@@ -1,34 +1,44 @@
 import * as ActionTypes from './ActionTypes';
-import produce from 'immer';
 
-const Recommendation = produce((
+const Recommendation = (
     draft = {
         
     }, action) => {
         switch(action.type){
             case ActionTypes.FETCH_ANIME_RECOMMEND_LOADING:
-                draft[action.payload] = {
-                    isLoading: true,
-                    err: false,
-                    recommendation: null
+                return {
+                    ...draft,
+                    [action.payload]: {
+                        isLoading: true,
+                        recommendation: null,
+                        err: false
+                    }   
                 }
-                return
 
             case ActionTypes.FETCH_ANIME_RECOMMEND_SUCCESS:
-                draft[action.payload.id].isLoading = false
-                draft[action.payload.id].recommendation = action.payload.recommendation.recommendations
-                draft[action.payload.id].err = null
-                return
+                return {
+                    ...draft,
+                    [action.payload.id]: {
+                        isLoading: false,
+                        recommendation: action.payload.recommendation.recommendations,
+                        err: null
+                    }   
+                }
 
             case ActionTypes.FETCH_ANIME_RECOMMEND_FAILED:
-                draft[action.payload.id].isLoading = false
-                draft[action.payload.id].err = action.payload.err
-                return
+                return {
+                    ...draft,
+                    [action.payload.id]: {
+                        isLoading: false,
+                        recommendation: null,
+                        err: action.payload.err
+                    }   
+                }
 
             default:
                 return draft
         }
     }
-)
+
 
 export default Recommendation;

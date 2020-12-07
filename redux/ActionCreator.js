@@ -14,7 +14,7 @@ export const logout = () => ({
 
 export const updateSearch = (str) => (dispatch) => {
     dispatch(updateSearchLoading())
-    axios.get(`https://api.jikan.moe/v3/search/anime?q=${str}&limit=10&genre=12&genre_exclude=0`)
+    axios.get(`https://api.jikan.moe/v3/search/anime?q=${str}&limit=10`)
     .then(response => {
         dispatch(updateSearchSuccess(response.data.results))
     })
@@ -46,11 +46,9 @@ export const clearPreviousSearch = () => ({
 export const fetchAnime = (id, token) => (dispatch) => {
 
     dispatch(fetchAnimeLoading(id))
-    console.log(id)
     axios.get(`https://api.jikan.moe/v3/anime/${id}`)
     .then((res) => {
         dispatch(fetchAnimeSuccess(res.data))
-        console.log(res.data)
     })
     .catch((err) => {
         console.error(err.message)
@@ -253,7 +251,6 @@ export const fetchAnimeCharacter = (id) => (dispatch) => {
     axios.get(`https://api.jikan.moe/v3/anime/${id}/characters_staff`)
     .then((res) => {
         dispatch(fetchAnimeCharacterSuccess(id, res.data))
-        //console.log(res.data)
     })
     .catch((err) => {
         console.error(err.message)
@@ -273,7 +270,6 @@ export const fetchAnimeCharacterSuccess = (id, character) => ({
 // ----------------
 
 export const fetchCharacterDetail = (url) => (dispatch) => {
-    console.log(url.substring(url.lastIndexOf('/') + 1))
     // axios.get(url)
     // .then((res) => {
 
@@ -300,7 +296,6 @@ export const fetchAnimeRecommendation = (id) => (dispatch) => {
     axios.get(`https://api.jikan.moe/v3/anime/${id}/recommendations`)
     .then((res) => {
         dispatch(fetchAnimeRecommendationSuccess(id, res.data))
-        //console.log(res.data)
     })
     .catch((err) => {
         console.error(err.message)
@@ -329,7 +324,7 @@ export const fetchAnimeRelated = (id, token) => (dispatch) => {
     })
     .then((res) => {
         dispatch(fetchAnimeRelatedSuccess(id, res.data))
-        console.log(res.data)
+
     })
     .catch((err) => {
         console.error(err.message)
@@ -350,7 +345,6 @@ export const fetchAnimeRelatedSuccess = (id, related) => ({
 
 export const fetchAnimeEpisodes = (id) => (dispatch) => {
 
-    console.log('fetching episodes')
     dispatch(fetchAnimeEpisodesLoading(id))
     axios.get(`https://api.jikan.moe/v3/anime/${id}/episodes`)
     .then((res) => {
@@ -512,6 +506,31 @@ export const fetchAnimeStatsSuccess = (id, data) => ({
 })
 
 // ------------------
+
+export const fetchAnimePictures = (id) => (dispatch) => {
+
+    dispatch(fetchAnimePicturesLoading(id))
+
+    axios.get(`https://api.jikan.moe/v3/anime/${id}/pictures`)
+    .then((res) => {
+        dispatch(fetchAnimePicturesSuccess(id, res.data))
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
+}
+
+export const fetchAnimePicturesLoading = (id) => ({
+    type: ActionTypes.FETCH_ANIME_PICTURE_LOADING,
+    payload: id
+})
+
+export const fetchAnimePicturesSuccess = (id, data) => ({
+    type: ActionTypes.FETCH_ANIME_PICTURE_SUCCESS,
+    payload: { id, pictures: data.pictures }
+})
+
+// -----------
 
 export const fetchAnimeReviews = (id) => (dispatch) => {
 

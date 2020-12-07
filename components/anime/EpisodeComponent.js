@@ -5,8 +5,8 @@ import { connect } from 'react-redux';
 import { fetchAnimeEpisodes } from '../../redux/ActionCreator'
 import Moment from 'moment'
 
-const mapStateToProps = state => ({
-    episode: state.episode,
+const mapStateToProps = (state, props) => ({
+    episode: state.episode[props.id],
     theme: state.options.ui
 })
 
@@ -17,7 +17,7 @@ const mapDispatchToProps = dispatch => ({
 class Episode extends React.PureComponent {
 
     componentDidMount(){
-        if(this.props.episode[this.props.id] === undefined)
+        if(this.props.episode === undefined)
             this.props.fetchAnimeEpisodes(this.props.id)
     }
 
@@ -25,22 +25,22 @@ class Episode extends React.PureComponent {
         
         Moment.locale('en') 
                 
-        if(this.props.episode[this.props.id] && this.props.episode[this.props.id].err){
+        if(this.props.episode && this.props.episode.err){
             return (
                 <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center'  }}>
                     <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#fff', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>An unexpected error occured</Text>
                 </View>
             )
-        } else if(this.props.episode[this.props.id] && this.props.episode[this.props.id].isLoading){
+        } else if(this.props.episode && this.props.episode.isLoading){
             return (
                 <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center' }}>
                     <ActivityIndicator size='large' color='#fff'/>
                     <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: '#fff', fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>Loading Episodes...</Text>
                 </View>
             )
-        } else if(this.props.episode[this.props.id]) {
+        } else if(this.props.episode) {
             return (
-                <FlatList data={this.props.episode[this.props.id].episodes} 
+                <FlatList data={this.props.episode.episodes} 
                     renderItem={({ item, index }) => (
                     <TouchableOpacity key={index} activeOpacity={0.7} onPress={()=>this.props.navigation.navigate('Web', { uri: item.forum_url })}>
                     <ListItem key={index} containerStyle={{height: 80, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: this.props.theme[this.props.theme.current].anime.card, overflow: 'hidden' }}>

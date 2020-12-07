@@ -1,34 +1,41 @@
 import * as ActionTypes from './ActionTypes';
-import produce from 'immer';
 
-const Related = produce((
-    draft = {
-        
-    }, action) => {
+const Related = (
+    draft = { }, action) => {
         switch(action.type){
             case ActionTypes.FETCH_ANIME_RELATED_LOADING:
-                draft[action.payload] = {
-                    isLoading: true,
-                    err: false,
-                    related: null
+                return {
+                    ...draft,
+                    [action.payload]: {
+                        isLoading: true,
+                        related: null,
+                        err: false
+                    }   
                 }
-                return
 
             case ActionTypes.FETCH_ANIME_RELATED_SUCCESS:
-                draft[action.payload.id].isLoading = false
-                draft[action.payload.id].related = action.payload.related_anime
-                draft[action.payload.id].err = null
-                return
+                return {
+                    ...draft,
+                    [action.payload.id]: {
+                        isLoading: false,
+                        related: action.payload.related_anime,
+                        err: null
+                    }   
+                }
 
             case ActionTypes.FETCH_ANIME_RELATED_FAILED:
-                draft[action.payload.id].isLoading = false
-                draft[action.payload.id].err = action.payload.err
-                return
+                return {
+                    ...draft,
+                    [action.payload.id]: {
+                        isLoading: false,
+                        related: null,
+                        err: action.payload.err
+                    }   
+                }
 
             default:
                 return draft
         }
     }
-)
 
 export default Related;
