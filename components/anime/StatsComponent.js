@@ -5,10 +5,8 @@ import { connect } from 'react-redux';
 import { fetchAnimeStats } from '../../redux/ActionCreator'
 
 const mapStateToProps = (state,props) => ({
-    stats: state.stats[props.id],
-    score: state.anime[props.id].anime.mean,
-    popularity: state.anime[props.id].anime.popularity,
-    rank: state.anime[props.id].anime.rank,
+    anime: state.anime[props.route.params.id],
+    stats: state.stats[props.route.params.id],
     theme: state.options.ui
 })
 
@@ -56,19 +54,15 @@ class Stats extends React.PureComponent {
     }
 
     componentDidMount() {
-       
-        InteractionManager.runAfterInteractions(() => {
-            if(this.props.stats === undefined)
-                this.props.fetchAnimeStats(this.props.id)       
-            console.log('Interaction done')
-            this.setState({ interactionDone: true })
-        })
+        if(this.props.stats === undefined)
+            this.props.fetchAnimeStats(this.props.route.params.id)       
+        this.setState({ interactionDone: true })
         
     }
 
     render() {
 
-        if(this.props.stats === undefined || this.props.stats && this.props.stats.isLoading){
+        if(!this.state.interactionDone || this.props.stats === undefined || this.props.stats && this.props.stats.isLoading){
             return (
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <ActivityIndicator size='large' color='#fff'/>
@@ -85,25 +79,33 @@ class Stats extends React.PureComponent {
                 { x: "Dropped", y: stats.dropped, color: "rgba(0, 5, 153, 0.7)" },
             ]
 
-            var data_bar = []
-            for(var i = 1; i <= 10; i++){
-                data_bar.push({ x: i, y: stats.scores[i].votes })
-            }
+            const data_bar = [
+                { x: 1, y: stats.scores[1].votes },
+                { x: 2, y: stats.scores[2].votes },
+                { x: 3, y: stats.scores[3].votes },
+                { x: 4, y: stats.scores[4].votes },
+                { x: 5, y: stats.scores[5].votes },
+                { x: 6, y: stats.scores[6].votes },
+                { x: 7, y: stats.scores[7].votes },
+                { x: 8, y: stats.scores[8].votes },
+                { x: 9, y: stats.scores[9].votes },
+                { x: 10, y: stats.scores[10].votes }
+            ]
 
             return (
                 <ScrollView contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 8 }}>
                     <View style={{ flex: 1, flexDirection: 'row', backgroundColor: this.props.theme[this.props.theme.current].anime.card, marginBottom: 8, borderRadius: 10, overflow: 'hidden' }}>
                         <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center', borderRightWidth: 1, borderColor: '#b0b0b0a0' }} >
                             <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>SCORE</Text>
-                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>{this.props.score}</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>{ this.props.anime.anime && this.props.anime.anime.mean ? this.props.anime.anime.mean : '-' }</Text>
                         </View>
                         <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center', borderRightWidth: 1, borderColor: '#b0b0b0a0' }} >
                             <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>RANK</Text>
-                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>#{this.props.rank}</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>{ this.props.anime.anime && this.props.anime.anime.rank ? '#' + this.props.anime.anime.rank : '-' }</Text>
                         </View>
                         <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center', borderRightWidth: 1, borderColor: '#b0b0b0a0' }} >
                             <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>POPULARITY</Text>
-                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>#{this.props.popularity}</Text>
+                            <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 20, fontFamily: 'SpaceGrotesk-Bold', }}>{ this.props.anime.anime && this.props.anime.anime.popularity ? '#' + this.props.anime.anime.popularity : '-' }</Text>
                         </View>
                         <View style={{ flex: 1, flexGrow: 1, padding: 8, alignItems: 'center' }} >
                             <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 12, fontFamily: 'SpaceGrotesk-Bold', }}>TOTAL</Text>
@@ -140,13 +142,11 @@ class Stats extends React.PureComponent {
                         <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingTop: 8, paddingLeft: 12 }}>Rating Stats</Text>
                         <VictoryBar
                             barRatio={1}
-                            height={300}
                             width={Math.ceil(Dimensions.get('window').width - 24)}
                             labels={({ datum }) => datum.x === 10 ? `${datum.x}   ${nFormatter(datum.y,0)}` : `  ${datum.x}   ${nFormatter(datum.y,0)}`}
                             horizontal
                             domainPadding={30}
                             data={data_bar}
-                            origin={{ x: 0, y: 0 }}
                             padding={{ left: 0 , top: 0, bottom: 0, right: 8 }}
                             cornerRadius={{ topLeft: 12, topRight: 12 }}
                             style={{ labels: { fontFamily: 'SpaceGrotesk-Bold', fill: this.props.theme[this.props.theme.current].anime.text }, data: { fill: ({ datum }) => bar_color[datum.x - 1] } }}

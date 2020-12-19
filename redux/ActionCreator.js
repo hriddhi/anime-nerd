@@ -1,5 +1,6 @@
 import * as ActionTypes from './ActionTypes';
 import axios from 'axios';
+import { ToastAndroid } from 'react-native'
 
 export const getToken = (token) => ({
     type: ActionTypes.GET_ACCESS_TOKEN,
@@ -13,6 +14,12 @@ export const logout = () => ({
 // ---------------------------------------------------
 
 export const updateSearch = (str) => (dispatch) => {
+
+    if(str.length < 3){
+        ToastAndroid.show('Enter atleast 3 character', ToastAndroid.SHORT)
+        return
+    }
+
     dispatch(updateSearchLoading())
     axios.get(`https://api.jikan.moe/v3/search/anime?q=${str}&limit=10`)
     .then(response => {
@@ -343,12 +350,14 @@ export const fetchAnimeRelatedSuccess = (id, related) => ({
 
 // ------------------
 
-export const fetchAnimeEpisodes = (id) => (dispatch) => {
+export const fetchAnimeEpisodes = (id, page) => (dispatch) => {
 
     dispatch(fetchAnimeEpisodesLoading(id))
-    axios.get(`https://api.jikan.moe/v3/anime/${id}/episodes`)
+    console.log('Loading ------------ ' + page)
+
+    axios.get(`https://api.jikan.moe/v3/anime/${id}/episodes/${page}`)
     .then((res) => {
-        dispatch(fetchAnimeEpisodesSuccess(id, res.data))
+        dispatch(fetchAnimeEpisodesSuccess(id, res.data, page))
     })
     .catch((err) => {
         console.error(err.message)
@@ -360,9 +369,14 @@ export const fetchAnimeEpisodesLoading = (id) => ({
     payload: id
 })
 
-export const fetchAnimeEpisodesSuccess = (id, data) => ({
+export const fetchAnimeEpisodesSuccess = (id, data, page) => ({
     type: ActionTypes.FETCH_ANIME_EPISODES_SUCCESS,
-    payload: { episodes: data.episodes, id }
+    payload: { 
+        episodes: data.episodes, 
+        id, 
+        episodes_last_page: data.episodes_last_page, 
+        current_page: page 
+    }
 })
 
 // ------------------------------------------
@@ -559,4 +573,103 @@ export const fetchAnimeReviewsSuccess = (id, data) => ({
 export const changeTheme = (theme) => ({
     type: ActionTypes.CHANGE_THEME,
     payload: theme
+})
+
+export const toggleImageBackground = () => ({
+    type: ActionTypes.TOGGLE_IMAGE_BACKGROUND
+})
+
+
+
+
+
+
+
+
+// SFDGGDSFGDGDFFG DFGFDGSFGGSDFGFDG GDFGSDFGSDFGSDGSG
+
+
+
+
+
+
+
+
+
+export const fetchTopAnime = (type, page) => (dispatch) => {
+    if(type === 'all') {
+        dispatch(fetchTopAnimeLoading('all'))
+        axios.get(`https://api.jikan.moe/v3/top/anime`)
+        .then((res) => {
+            dispatch(fetchTopAnimeSuccess(res.data.top, 'all', undefined))
+        })
+        .catch((err) => {
+            console.error(type + ' ' + err.message)
+            dispatch(fetchTopAnimeFailed(type))
+        })
+    } else if(type === 'characters') {
+        dispatch(fetchTopAnimeLoading('characters'))
+        axios.get(`https://api.jikan.moe/v3/top/characters/${page}`)
+        .then((res) => {
+            dispatch(fetchTopAnimeSuccess(res.data.top, 'characters', page))
+        })
+        .catch((err) => {
+            console.error(type + ' ' + err.message)
+            dispatch(fetchTopAnimeFailed(type))
+        })
+    } else {
+        dispatch(fetchTopAnimeLoading(type))
+        axios.get(`https://api.jikan.moe/v3/top/anime/${page}/${type}`)
+        .then((res) => {
+            dispatch(fetchTopAnimeSuccess(res.data.top, type, page))
+        })
+        .catch((err) => {
+            console.error(type + ' ' + err.message)
+            dispatch(fetchTopAnimeFailed(type))
+        })
+    }
+}
+
+export const fetchTopAnimeLoading = (type) => ({
+    type: ActionTypes.FETCH_TOP_ANIME_LOADING,
+    payload: type
+})
+
+export const fetchTopAnimeSuccess = (data, type, page) => ({
+    type: ActionTypes.FETCH_TOP_ANIME_SUCCESS,
+    payload: { data, type, page }
+})
+
+export const fetchTopAnimeFailed = (type) => ({
+    type: ActionTypes.FETCH_TOP_ANIME_ERROR,
+    payload: type
+})
+
+// ---------------------------------------------------
+
+export const fetchGenre = (genre_id, page) => (dispatch) => {
+    dispatch(fetchGenreLoading(genre_id))
+    axios.get(`https://api.jikan.moe/v3/genre/anime/${genre_id}/${page}`)
+    .then((res) => {
+        dispatch(fetchGenreSuccess(res.data.anime, genre_id, page))
+    })
+    .catch((err) => {
+        console.error(type + ' ' + err.message)
+        dispatch(fetchGenreFailed(type))
+    })
+}
+
+export const fetchGenreLoading = (genre_id) => ({
+    type: ActionTypes.FETCH_GENRE_LOADING,
+    payload: genre_id
+})
+
+export const fetchGenreSuccess = (data, genre_id, page) => ({
+    type: ActionTypes.FETCH_GENRE_SUCCESS,
+    payload: { data, type: genre_id, page }
+})
+
+export const fetchGenreFailed = (genre_id) => ({
+    type: ActionTypes.FETCH_GENRE_ERROR,
+    payload: genre_id
 })

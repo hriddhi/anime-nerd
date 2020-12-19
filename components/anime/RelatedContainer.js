@@ -22,7 +22,7 @@ class Related extends React.PureComponent {
     };
 
     componentDidMount() {
-        if(this.props.related[this.props.id] === undefined)
+        if(this.props.token !== null && this.props.related[this.props.id] === undefined)
             this.props.fetchAnimeRelated(this.props.id, this.props.token)
     }
 
@@ -36,7 +36,13 @@ class Related extends React.PureComponent {
                 <Text style={{ color: this.props.theme[this.props.theme.current].anime.text, fontSize: 18, fontFamily: 'SpaceGrotesk-Bold', paddingLeft: 12, padding: 8 }}>Related</Text>
                 {
                     (() => {
-                        if(this.props.related[this.props.id] && this.props.related[this.props.id].err){
+                        if(this.props.token === null){
+                            return (
+                                <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center'  }}>
+                                    <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: this.props.theme[this.props.theme.current].anime.text, fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>Login with MAL to view Related Animes</Text>
+                                </View>
+                            )
+                        } else if(this.props.related[this.props.id] && this.props.related[this.props.id].err){
                             return (
                                 <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center'  }}>
                                     <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: this.props.theme[this.props.theme.current].anime.text, fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>An unexpected error occured</Text>
@@ -45,7 +51,7 @@ class Related extends React.PureComponent {
                         } else if(this.props.related[this.props.id] && this.props.related[this.props.id].isLoading){
                             return (
                                 <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center' }}>
-                                    <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: this.props.theme[this.props.theme.current].anime.text, fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>Loading Related Animes...</Text>
+                                    <Text style={{ fontFamily: 'SpaceGrotesk-SemiBold', color: this.props.theme[this.props.theme.current].anime.text, fontSize: 16, paddingVertical: 16, alignSelf: 'center' }}>Loading Related Animes ...</Text>
                                 </View>
                             )
                         } else if(this.props.related[this.props.id]) {

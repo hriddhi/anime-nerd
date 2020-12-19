@@ -14,6 +14,8 @@ import Stats from './stats'
 import Reviews from './reviews'
 import Options from './options'
 import Pictures from './picture'
+import Top from './top'
+import Genre from './genre'
 import { persistStore, persistReducer } from 'redux-persist'
 
 const persistConfig = {
@@ -38,7 +40,9 @@ const store = createStore(
             mal: MAL,
             stats: Stats,
             reviews: Reviews,
-            options: Options
+            options: Options,
+            top: Top,
+            genre: Genre
         })
     ),
     applyMiddleware(thunk)

@@ -5,11 +5,6 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react'
 import { store, persistor } from './redux/configureStore';
 import Main from './components/MainComponent';
-import Tab from './components/TabComponent'
-import LinearGradient from 'react-native-linear-gradient'
-import { enableES5 } from 'immer';
-
-enableES5()
 
 class App extends React.Component {
 

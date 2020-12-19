@@ -28,8 +28,11 @@ class MAL extends React.PureComponent {
     }
 
     componentDidMount() {
-        if(this.props.mal === undefined)
+        console.log('--------' + this.props.access_token)
+        if(this.props.access_token !== null && this.props.mal === undefined){
             this.props.fetchAnimeStatus(this.props.id, this.props.access_token)
+            console.log('sfsdfsfsff')
+        }
     }
 
     setmodal_status = () => {
@@ -279,9 +282,20 @@ class MAL extends React.PureComponent {
 
     render() {
 
-        console.log(this.props.mal)
-
-        if(this.props.mal && this.props.mal.status){
+        if(this.props.access_token === null){
+            return (
+                <View style={{flex: 1, flexDirection: 'row', backgroundColor: this.props.theme[this.props.theme.current].anime.card, marginBottom: 8, borderRadius: 36, overflow: 'hidden' }}>
+                    <View style={{flex: 1, flexGrow: 2 }}>
+                        <Button title='Login with MAL' 
+                            type='outline' 
+                            titleStyle={{ color: this.props.theme[this.props.theme.current].anime.text, fontFamily: 'SpaceGrotesk-SemiBold' }} 
+                            buttonStyle={{ height: '100%', borderWidth: 0 }} 
+                            onPress={() => this.props.navigation.navigate('Web',{ uri: 'https://animenerd.herokuapp.com/auth' }) } 
+                        />
+                    </View>
+                </View>
+            )
+        } else if(this.props.mal && this.props.mal.status){
             return (
                 <React.Fragment>
                     <View style={{flex: 1, overflow: 'hidden', flexDirection: 'row',  backgroundColor: this.props.theme[this.props.theme.current].anime.card, marginBottom: 8, borderRadius: 36 }}>
@@ -344,13 +358,13 @@ class MAL extends React.PureComponent {
             )
         } else {
             return (
-                <View style={{flex: 1, flexDirection: 'row', backgroundColor: this.props.theme[this.props.theme.current].anime.card, marginBottom: 8, borderRadius: 36 }}>
-                    <View style={{flex: 1, flexGrow: 2}}>
+                <View style={{flex: 1, flexDirection: 'row', backgroundColor: this.props.theme[this.props.theme.current].anime.card, marginBottom: 8, borderRadius: 36, overflow: 'hidden' }}>
+                    <View style={{flex: 1, flexGrow: 2 }}>
                         <Button title='Add to Profile' 
                             type='outline' 
-                            titleStyle={{ color: this.props.theme[this.props.theme.current].anime.text, fontFamily: 'SpaceGrotesk-Bold' }} 
+                            titleStyle={{ color: this.props.theme[this.props.theme.current].anime.text, fontFamily: 'SpaceGrotesk-SemiBold' }} 
                             buttonStyle={{ height: '100%', borderWidth: 0 }} 
-                            icon={ <Icon name="plus"  type='font-awesome' size={18} color={this.props.theme[this.props.theme.current].anime.text} style={{ paddingRight: 16 }}  /> } 
+                            icon={ <Icon name="plus"  type='font-awesome-5' size={18} color={this.props.theme[this.props.theme.current].anime.text} style={{ paddingRight: 16 }}  /> } 
                             loading={ !this.props.mal || (this.props.mal.isLoading || this.props.mal.isUpdating.status) ? true : false} 
                             loadingProps={{color: '#000'}}
                             onPress={()=>this.props.updateAnime(this.props.id, { status : `plan_to_watch` }, this.props.access_token)} 

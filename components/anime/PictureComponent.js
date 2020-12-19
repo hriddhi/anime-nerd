@@ -1,13 +1,11 @@
 import React from 'react';
 import { Modal, FlatList, View, Text, ActivityIndicator, TouchableOpacity, Linking, Image } from 'react-native';
-import { ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { fetchAnimePictures } from '../../redux/ActionCreator'
-import Moment from 'moment'
 import ImageViewer from 'react-native-image-zoom-viewer';
 
-const mapStateToProps = (state,props) => ({
-    pictures: state.pictures[props.id],
+const mapStateToProps = (state, props) => ({
+    pictures: state.pictures[props.route.params.id],
     theme: state.options.ui
 })
 
@@ -23,7 +21,7 @@ class Picture extends React.PureComponent {
 
     componentDidMount(){
         if(this.props.pictures === undefined)
-            this.props.fetchAnimePictures(this.props.id)
+            this.props.fetchAnimePictures(this.props.route.params.id)
         
     }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { SafeAreaView, StyleSheet, ScrollView, View, StatusBar, Linking, Text, Image } from 'react-native';
 import { Button, Icon } from 'react-native-elements'
-import Web from './WebViewComponent'
+import { useNavigation } from '@react-navigation/native';
 import { connect } from 'react-redux';
 import { getToken } from '../redux/ActionCreator'
 import LinearGradient from 'react-native-linear-gradient';
@@ -15,20 +15,6 @@ const mapDispatchToProps = dispatch => ({
 })
 
 class Login extends React.Component {
-
-    handleOpenURL = ({ url }) => {
-        if (url.indexOf("?id") !== -1) 
-          if (url)
-            this.props.getToken(url.split('=')[1])
-    };
-
-    componentDidMount(){
-        Linking.addEventListener('url', this.handleOpenURL)
-    }
-
-    componentWillUnmount(){
-        Linking.removeEventListener('url')
-    }
 
     render() { 
         return (
@@ -65,4 +51,6 @@ const styles = StyleSheet.create({
     }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+Wrapper = (props) => <Login {...props} navigation={useNavigation()} />
+
+export default connect(mapStateToProps, mapDispatchToProps)(Wrapper)

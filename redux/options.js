@@ -4,6 +4,7 @@ const Options = (
     draft = {
         ui: {
             current: 'default',
+            image_background: true,
             default: {
                 home: {
                     linear_background: ['#17009c','#5c007a'],
@@ -144,6 +145,15 @@ const Options = (
                     ui: {
                         ...draft.ui,
                         current: action.payload
+                    }
+                }
+
+            case ActionTypes.TOGGLE_IMAGE_BACKGROUND:
+                return {
+                    ...draft,
+                    ui: {
+                        ...draft.ui,
+                        image_background: !draft.ui.image_background
                     }
                 }
 

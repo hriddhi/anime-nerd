@@ -3,7 +3,6 @@ import { StyleSheet, FlatList, ScrollView, View, Text, Dimensions, TouchableOpac
 import { Avatar, ListItem, Image, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { getToken, fetchUserAnime, fetchAnime } from '../redux/ActionCreator'
-import LinearGradient from 'react-native-linear-gradient';
 import * as Progress from 'react-native-progress';
 
 const mapStateToProps = state => ({
@@ -27,31 +26,31 @@ class List extends React.Component {
     }
 
     componentDidMount() {
-        switch(this.props.type){
+        switch(this.props.route.params.type){
           case 'watching':
-            this.props.fetchUserAnime(this.props.type, this.props.auth.access_token)
+            this.props.fetchUserAnime(this.props.route.params.type, this.props.auth.access_token)
             break
 
           case 'plan_to_watch':
-            this.props.fetchUserAnime(this.props.type, this.props.auth.access_token)
+            this.props.fetchUserAnime(this.props.route.params.type, this.props.auth.access_token)
             break
 
           case 'on_hold':
-            this.props.fetchUserAnime(this.props.type, this.props.auth.access_token)
+            this.props.fetchUserAnime(this.props.route.params.type, this.props.auth.access_token)
             break
 
           case 'dropped':
-            this.props.fetchUserAnime(this.props.type, this.props.auth.access_token)
+            this.props.fetchUserAnime(this.props.route.params.type, this.props.auth.access_token)
             break
 
           case 'completed':
-            this.props.fetchUserAnime(this.props.type, this.props.auth.access_token)
+            this.props.fetchUserAnime(this.props.route.params.type, this.props.auth.access_token)
             break
       }
     }
 
     onRefresh = () => {
-      this.props.fetchUserAnime(this.props.type, this.props.auth.access_token)
+      this.props.fetchUserAnime(this.props.route.params.type, this.props.auth.access_token)
     }
 
     viewAnime = (id) => {
@@ -60,16 +59,16 @@ class List extends React.Component {
     }
 
     render() {
-        var data = this.props.list[this.props.type]
-        if(!this.props.list[this.props.type] && this.props.list.isLoading[this.props.type]) {
+        var data = this.props.list[this.props.route.params.type]
+        if(!this.props.list[this.props.route.params.type] && this.props.list.isLoading[this.props.route.params.type]) {
           return (
               <View style={[styles.container]}>
                 <ActivityIndicator size="large" color="#fff" />
               </View>
           );
-        } else if(this.props.list.visible[this.props.type]) {
+        } else if(this.props.list.visible[this.props.route.params.type]) {
             return (
-              <FlatList data={data.data} onRefresh={this.onRefresh} refreshing={(Boolean)(this.props.list.isLoading[this.props.type] && this.props.list[this.props.type])} 
+              <FlatList data={data.data} onRefresh={this.onRefresh} refreshing={(Boolean)(this.props.list.isLoading[this.props.route.params.type] && this.props.list[this.props.route.params.type])} 
                 renderItem={({ item }) => (
                 <TouchableOpacity key={item.node.id} activeOpacity={0.7} onPress={()=>this.viewAnime(item.node.id)}>
                   <ListItem key={item.node.id} containerStyle={{height: 120, padding: 0, marginVertical: 4, marginHorizontal: 8, borderRadius: 10, backgroundColor: this.props.theme[this.props.theme.current].home.card, overflow: 'hidden' }}>

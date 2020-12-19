@@ -1,12 +1,11 @@
 import React from 'react';
 import { LayoutAnimation, Platform, UIManager, FlatList, View, Text, ActivityIndicator, TouchableOpacity, Linking } from 'react-native';
-import { ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { fetchAnimeReviews } from '../../redux/ActionCreator'
 import Moment from 'moment'
 
 const mapStateToProps = (state,props) => ({
-    reviews: state.reviews[props.id],
+    reviews: state.reviews[props.route.params.id],
     theme: state.options.ui
 })
 
@@ -24,7 +23,7 @@ class reviews extends React.PureComponent {
 
     componentDidMount(){
         if(this.props.reviews === undefined)
-            this.props.fetchAnimeReviews(this.props.id)
+            this.props.fetchAnimeReviews(this.props.route.params.id)
         if (Platform.OS === 'android') {
             UIManager.setLayoutAnimationEnabledExperimental(true);
         }

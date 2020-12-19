@@ -1,16 +1,10 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import { StatusBar, Text } from 'react-native'
-import { SearchBar, Input, ThemeProvider, Icon } from 'react-native-elements';
-import Home from './HomeComponent';
-import Search from './SearchComponent';
-import Anime from './AnimeComponent'
-import Web from './WebViewComponent'
+import { Text } from 'react-native'
+import { Icon } from 'react-native-elements';
+import Home from './HomeComponent'
+import Explore from './ExploreComponent'
 import Setting from './SettingComponent'
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { enableScreens } from 'react-native-screens'
-import { createNativeStackNavigator } from 'react-native-screens/native-stack'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 
 
@@ -43,6 +37,13 @@ class Tab extends React.Component {
               options={{ 
                 tabBarLabel: <Text style={{ fontSize: 12, fontFamily: 'SpaceGrotesk-SemiBold' }}>HOME</Text>,
                 tabBarIcon: ({focused}) => <Icon name='home' size={ focused ? 24 : 22 } type='font-awesome' color={ focused ? this.props.theme[this.props.theme.current].home.bottom_tab_color : 'grey' }/>,
+              }}
+            />
+            <BottomTab.Screen name="Explore" 
+              component={Explore}
+              options={{ 
+                tabBarLabel: <Text style={{ fontSize: 12, fontFamily: 'SpaceGrotesk-SemiBold' }}>EXPLORE</Text>,
+                tabBarIcon: ({focused}) => <Icon name='compass' size={ focused ? 24 : 22 } type='font-awesome-5' color={ focused ? this.props.theme[this.props.theme.current].home.bottom_tab_color : 'grey' }/>,
               }}
             />
             <BottomTab.Screen name="Settings" 
